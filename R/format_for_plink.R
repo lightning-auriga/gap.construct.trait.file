@@ -14,6 +14,7 @@
 #' @param output.df data frame; partially formatted model matrix
 #' @return reformatted input with plink-specific modifications
 format.for.plink <- function(output.df) {
+  stopifnot(is.data.frame(output.df))
   output.df <- cbind(
     rep("0", nrow(output.df)),
     output.df
