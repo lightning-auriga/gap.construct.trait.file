@@ -18,7 +18,7 @@
 load.and.process.eigenvectors <- function(eigenvectors) {
   ## input sanity checking
   stopifnot(is.vector(eigenvectors, mode = "character"), length(eigenvectors) == 1)
-  read.table(eigenvectors,
+  eigenvectors <- read.table(eigenvectors,
     header = FALSE,
     skip = 1,
     comment.char = "",
