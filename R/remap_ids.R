@@ -26,7 +26,7 @@
 #' if the provided linker existed, or as-is otherwise
 remap.ids <- function(vec,
                       filename) {
-  if (!is.na(filename)) {
+  if (!isTRUE(is.na(filename))) {
     stopifnot(is.vector(filename, mode = "character"), length(filename) == 1)
     stopifnot(file.exists(filename))
     linker <- read.table(filename, header = TRUE, stringsAsFactors = FALSE)
