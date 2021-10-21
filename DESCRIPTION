@@ -11,6 +11,10 @@ Description: Read in phenotype text files and configuration yamls. Apply
     files in specified formats for use in downstream GWAS analysis tools.
     Test library utilities.
 License: MIT + file LICENSE
+Imports:
+    process.phenotypes,
+    stringr,
+    yaml
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
