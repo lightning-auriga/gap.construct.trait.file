@@ -40,6 +40,12 @@ construct.phenotype.output <- function(output.df,
                                        phenotype.config,
                                        analysis.config,
                                        analysis.name) {
+  stopifnot(is.data.frame(output.df))
+  stopifnot(is.data.frame(phenotype.data))
+  stopifnot(is.list(phenotype.config))
+  stopifnot(is.list(analysis.config))
+  stopifnot(is.vector(analysis.name, mode = "character"), length(analysis.name) == 1)
+  stopifnot(nrow(output.df) == nrow(phenotype.data))
   phenotype.name <- analysis.config$analyses[[analysis.name]]$phenotype
   ## add the phenotype to the variable queries
   added.df <- restructure.variable(
