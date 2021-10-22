@@ -165,6 +165,16 @@ construct.trait.file <- function(phenotype.file,
     if (i == 1) {
       res <- res.partial
     } else {
+      ## detect merge problems
+      if (!identical(colnames(res))) {
+        stop(paste("merging of multiple datasets failed. this is most likely due",
+          " to different patterns of categorical level merging in smaller ",
+          "and bigger datasets. please consider changing the value of ",
+          "collapse.limit to a smaller number; otherwise, conduct manual ",
+          "merge, or request a patch to this software",
+          sep = ""
+        ))
+      }
       res <- rbind(res, res.partial)
     }
   }
