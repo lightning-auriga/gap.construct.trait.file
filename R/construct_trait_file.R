@@ -155,7 +155,7 @@ construct.trait.file <- function(phenotype.file,
   subject.id.varname <- process.phenotypes:::find.subject.id.varname(phenotype.config)
 
   ## if id.linker is NA, this will just return the original ID list unchanged
-  phenotype.data[, subject.id.varname] <- remap.ids(
+  phenotype.data[, subject.id.varname] <- gap.construct.trait.file::remap.ids(
     phenotype.data[, subject.id.varname],
     id.linker
   )

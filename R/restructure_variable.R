@@ -88,7 +88,7 @@ restructure.variable <- function(phenotype.data,
         collapsed.levels <- c(collapsed.levels, names(factor.levels)[i])
         next
       }
-      new.var <- make.binary.dummy(
+      new.var <- gap.construct.trait.file::make.binary.dummy(
         res,
         names(factor.levels)[i]
       )
@@ -109,7 +109,7 @@ restructure.variable <- function(phenotype.data,
         ".ref", names(factor.levels)[1],
         ".cmpOTHER",
         sep = ""
-      )] <- make.binary.dummy(res, collapsed.levels)
+      )] <- gap.construct.trait.file::make.binary.dummy(res, collapsed.levels)
     }
     ## override naming scheme if there were only two levels
     if (length(factor.levels) == 2) {
