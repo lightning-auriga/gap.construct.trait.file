@@ -8,7 +8,41 @@ analysisconfig <- testthat::test_path("files", "combine_trait_files", "analysis.
 eigenvectors <- testthat::test_path("files", "combine_trait_files", "eigenvectors.tsv")
 
 test_that("combine.trait.files checks input types", {
-
+  expect_error(combine.trait.files(
+    c("", ""), "", "", "",
+    TRUE, TRUE, TRUE,
+    "", "", as.integer(0), "", FALSE
+  ))
+  expect_error(combine.trait.files(
+    "", c("", ""), "", "",
+    TRUE, TRUE, TRUE,
+    "", "", as.integer(0), "", FALSE
+  ))
+  expect_error(combine.trait.files(
+    "", "", c("", ""), "",
+    TRUE, TRUE, TRUE,
+    "", "", as.integer(0), "", FALSE
+  ))
+  expect_error(combine.trait.files(
+    "", "", "", c("", ""),
+    TRUE, TRUE, TRUE,
+    "", "", as.integer(0), "", FALSE
+  ))
+  expect_error(combine.trait.files(
+    "", "", "", "",
+    TRUE, TRUE, TRUE,
+    "", "", as.integer(0), c("", ""), FALSE
+  ))
+  expect_error(combine.trait.files(
+    "", "", "", "",
+    "", TRUE, TRUE,
+    "", "", as.integer(0), "", FALSE
+  ))
+  expect_error(combine.trait.files(
+    1, "", "", "",
+    TRUE, TRUE, TRUE,
+    "", "", as.integer(0), "", "step"
+  ))
 })
 
 test_that("combine.trait.files conducts a simple merge of phenotypes", {
@@ -68,7 +102,27 @@ test_that("combine.trait.files conducts a simple merge of covariates", {
 })
 
 test_that("combine.trait.files respects user suppression of batch variable", {
-
+  expected.df <- data.frame(
+    FID = "0",
+    IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"),
+    V2 = c(0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1),
+    stringsAsFactors = FALSE
+  )
+  res <- combine.trait.files(
+    c(phenodata1, phenodata2),
+    c(phenoconfig1, phenoconfig2),
+    c(NA, NA),
+    eigenvectors,
+    TRUE,
+    FALSE,
+    TRUE,
+    analysisconfig,
+    "a1",
+    as.integer(0),
+    c(NA, NA),
+    TRUE
+  )
+  expect_identical(res, expected.df)
 })
 
 test_that("combine.trait.files finds and removes duplicates introduced by merging", {
