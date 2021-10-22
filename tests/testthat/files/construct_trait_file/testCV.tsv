@@ -1,0 +1,4 @@
+subject_id	phenotype1	phenotype2	phenotype3
+A	0	NA	"something"
+B	1	"crocodile"	"something	else"
+C	1.6	"llama"	"something"

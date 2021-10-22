@@ -104,12 +104,11 @@ construct.trait.file <- function(phenotype.file,
                                  id.linker) {
   ## input sanity checks, and load yaml configuration data for shared models, if specified
   ## this is combined for complexity reasons
-  phenotype.config <- NULL
   stopifnot(is.vector(phenotype.file, mode = "character"), length(phenotype.file) == 1)
   stopifnot(file.exists(phenotype.file))
   stopifnot(is.vector(phenotype.config, mode = "character"), length(phenotype.config) == 1)
   stopifnot(file.exists(phenotype.config))
-  if (!is.na(phenotype.shared.models)) {
+  if (!isTRUE(is.na(phenotype.shared.models))) {
     stopifnot(
       is.vector(phenotype.shared.models, mode = "character"),
       length(phenotype.shared.models) == 1
@@ -132,7 +131,7 @@ construct.trait.file <- function(phenotype.file,
   stopifnot(file.exists(analysis.config))
   stopifnot(is.vector(analysis.name, mode = "character"), length(analysis.name) == 1)
   stopifnot(is.integer(collapse.limit), length(collapse.limit) == 1)
-  if (!is.na(id.linker)) {
+  if (!isTRUE(is.na(id.linker))) {
     stopifnot(is.vector(id.linker, mode = "character"), length(id.linker) == 1)
     stopifnot(file.exists(id.linker))
   }
@@ -150,19 +149,25 @@ construct.trait.file <- function(phenotype.file,
   ## to prevent plink from complaining about distributions and variance
   eigenvectors <- gap.construct.trait.file::load.and.process.eigenvectors(eigenvectors)
 
-
   ## locate and add the subject ID column
-  subject.id.varname <- process.phenotypes:::find.subject.id.varname(phenotype.config)
+  subject.id.index <- unlist(sapply(seq_len(length(phenotype.config$variables)), function(i) {
+    if (!is.null(phenotype.config$variables[[i]]$subject_id)) {
+      i
+    }
+  }))
+  stopifnot(length(subject.id.index) == 1, phenotype.config$variables[[subject.id.index]]$subject_id)
 
   ## if id.linker is NA, this will just return the original ID list unchanged
-  phenotype.data[, subject.id.varname] <- remap.ids(
-    phenotype.data[, subject.id.varname],
+  phenotype.data[, subject.id.index] <- remap.ids(
+    phenotype.data[, subject.id.index],
     id.linker
   )
   ## remove instances where IDs fail to link
-  phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.varname]), ]
+  print(phenotype.data)
+  phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.index]), ]
+  print(phenotype.data)
 
-  output.df <- data.frame(IID = phenotype.data[, subject.id.varname], stringsAsFactors = FALSE)
+  output.df <- data.frame(IID = phenotype.data[, subject.id.index], stringsAsFactors = FALSE)
 
   if (phenotype.output) {
     output.df <- gap.construct.trait.file::construct.phenotype.output(

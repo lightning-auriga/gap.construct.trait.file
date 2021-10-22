@@ -1,0 +1,13 @@
+tag: "CV"
+globals:
+  min_age_for_inclusion: 16
+variables:
+  subject:
+    type: "string"
+    subject_id: true
+  phenotype1:
+    type: "numeric"
+  phenotype2:
+    type: "string"
+  phenotype3:
+    shared_models: "shared_test"
