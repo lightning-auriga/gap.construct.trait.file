@@ -1,0 +1,7 @@
+analyses:
+  a1:
+    phenotype: V1
+    covariates:
+      - V2
+      - V3
+    pcs: 0
