@@ -186,6 +186,7 @@ combine.trait.files <- function(phenotype.file,
     res[, ncol(res)] <- NULL
     for (i in seq(2, length(phenotype.config))) {
       res[, ncol(res) + 1] <- gap.construct.trait.file::make.binary.dummy(batch.var, i)
+      colnames(res)[ncol(res)] <- paste("gap.merge.batch", i, sep = "")
     }
   }
   ## deal with the possibility that duplicates have been introduced by merging
@@ -193,5 +194,6 @@ combine.trait.files <- function(phenotype.file,
     res <- res[!duplicated(res[, 2]) & !duplicated(res[, 2], fromLast = TRUE), ]
   }
   ## return the combined data
+  rownames(res) <- NULL
   res
 }
