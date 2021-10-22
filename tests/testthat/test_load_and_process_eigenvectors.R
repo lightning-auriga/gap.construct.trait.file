@@ -1,6 +1,6 @@
-filename <- "files/load_and_process_eigenvectors/smartpca.evec"
-filename.bad1 <- "files/load_and_process_eigenvectors/smartpca.evec.mal1"
-filename.bad2 <- "files/load_and_process_eigenvectors/smartpca.evec.mal2"
+filename <- testthat::test_path("files", "load_and_process_eigenvectors", "smartpca.evec")
+filename.bad1 <- paste(filename, "mal1", sep = ".")
+filename.bad2 <- paste(filename, "mal2", sep = ".")
 
 test_that("load.and.process.eigenvectors checks input type", {
   expect_error(load.and.process.eigenvectors(data.frame(A = 1:4, B = 5:8)))

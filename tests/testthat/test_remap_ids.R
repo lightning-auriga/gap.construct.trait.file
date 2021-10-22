@@ -1,5 +1,5 @@
 ids <- c("A", "B", "C", "D", "E", "F", "G")
-filename <- "files/remap_ids/linker.tsv"
+filename <- testthat::test_path("files", "remap_ids", "linker.tsv")
 
 test_that("remap.ids checks input types", {
   expect_error(remap.ids(ids, c("two", "files")))
