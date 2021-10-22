@@ -21,7 +21,7 @@ construct.trait.file(
 \arguments{
 \item{phenotype.file}{character vector; path to and name of
 file containing phenotype information. file should be tab-delimited,
-with cells quoted in "..." as needed. this is expected to the be
+with cells quoted in "..." as needed. this is expected to be the
 processed output of process.phenotypes::create.phenotype.report}
 
 \item{phenotype.config}{character vector; path to and name of

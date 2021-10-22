@@ -17,7 +17,7 @@
 #'
 #' @param phenotype.file character vector; path to and name of
 #' file containing phenotype information. file should be tab-delimited,
-#' with cells quoted in "..." as needed. this is expected to the be
+#' with cells quoted in "..." as needed. this is expected to be the
 #' processed output of process.phenotypes::create.phenotype.report
 #' @param phenotype.config character vector; path to and name of
 #' file containing phenotype configuration data. file should be
@@ -154,20 +154,18 @@ construct.trait.file <- function(phenotype.file,
   ## locate and add the subject ID column
   subject.id.varname <- process.phenotypes:::find.subject.id.varname(phenotype.config)
 
-  if (!is.na(id.linker)) {
-    phenotype.data[, subject.id.varname] <- remap.ids(
-      phenotype.data[, subject.id.varname],
-      id.linker
-    )
-    ## remove instances where IDs fail to link
-    phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.varname]), ]
-  }
+  ## if id.linker is NA, this will just return the original ID list unchanged
+  phenotype.data[, subject.id.varname] <- remap.ids(
+    phenotype.data[, subject.id.varname],
+    id.linker
+  )
+  ## remove instances where IDs fail to link
+  phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.varname]), ]
 
-  output.df <- data.frame(IID = phenotype.data[, subject.id.varname])
-  output.df[, 1] <- as.vector(output.df[, 1], mode = "character")
+  output.df <- data.frame(IID = phenotype.data[, subject.id.varname], stringsAsFactors = FALSE)
 
   if (phenotype.output) {
-    gap.construct.trait.file::construct.phenotype.output(
+    output.df <- gap.construct.trait.file::construct.phenotype.output(
       output.df,
       phenotype.data,
       phenotype.config,
@@ -177,7 +175,7 @@ construct.trait.file <- function(phenotype.file,
   }
 
   if (covariate.output) {
-    gap.construct.trait.file::construct.covariate.output(
+    output.df <- gap.construct.trait.file::construct.covariate.output(
       output.df,
       phenotype.data,
       phenotype.config,
