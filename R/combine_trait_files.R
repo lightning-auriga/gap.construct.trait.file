@@ -1,8 +1,11 @@
-#' Build a gwas-ready trait file from phenotype configuration
+#' Build a gwas-ready trait file from phenotype configuration,
+#' potentially combining across multiple datasets
 #'
 #' @description Takes in assorted phenotype configuration information
 #' and run parameters and emits the requested formatted output as
-#' needed for downstream tools, e.g. plink2 --glm, regenie, etc.
+#' needed for downstream tools, e.g. plink2 --glm, regenie, etc. Combines
+#' across multiple datasets when they are each specified and contain
+#' compatible phenotype and covariate names.
 #'
 #' @details This package is designed as a downstream supplement
 #' to process.phenotypes, in that it receives output from that
@@ -15,16 +18,27 @@
 #' this information may not have the requested entries, in which case
 #' some things could be unexpectedly NULL.
 #'
+#' This is a utility function to combine data across multiple datasets,
+#' provided that the datasets have identically named phenotypes
+#' and covariates. Optionally, an additional batch variable
+#' is added to flag the contributing datasets as possible
+#' sources of batch effects.
+#'
 #' @param phenotype.file character vector; path to and name of
 #' file containing phenotype information. file should be tab-delimited,
 #' with cells quoted in "..." as needed. this is expected to be the
-#' processed output of process.phenotypes::create.phenotype.report
+#' processed output of process.phenotypes::create.phenotype.report.
+#' when combining multiple datasets with compatible variable names,
+#' this should be a vector of the same length as the other multiple
+#' entry parameters
 #' @param phenotype.config character vector; path to and name of
 #' file containing phenotype configuration data. file should be
 #' yaml format. this file is expected to be the corresponding
 #' configuration that led to the generation of the phenotype
 #' matrix, and the yaml tags expected and recognized in this file
-#' are documented with that package
+#' are documented with that package. when combining multiple
+#' datasets with compatible variable names, this should be a
+#' vector of the same length as the other multiple entry parameters
 #' @param phenotype.shared.models character vector; path to and
 #' name of file containing shared model configuration data. file should
 #' be yaml format. this file is expected to be the corresponding
@@ -33,7 +47,9 @@
 #' with that package. note that this file is not required; NA
 #' is permitted, in which case the phenotype config file itself
 #' must explicitly specify "type:" for all variables, and never
-#' use the "shared_model:" tag
+#' use the "shared_model:" tag. when combining multiple datasets
+#' with compatible variable names, this should be a vector of the
+#' same length as the other multiple entry parameters
 #' @param eigenvectors character vector; path to and name
 #' of file containing subject-level eigenvector data. file should
 #' be the output format of smartpca, with a single, strange header
@@ -57,11 +73,15 @@
 #' @param analysis.config character vector; path to and name of
 #' configuration file for target downstream analysis. file should
 #' be yaml format. recognized configuration options are specified
-#' in the documentation for gwas-analysis-pipeline
+#' in the documentation for gwas-analysis-pipeline. even when
+#' combining multiple datasets with compatible variable names,
+#' this should still only be a single file
 #' @param analysis.name character vector; unique name of analysis
 #' currently being processed. this should correspond to one of
 #' the block names under the "analyses:" tag in the analysis
-#' configuration file
+#' configuration file. even when combining multiple datasets
+#' with compatible variable names, this should still
+#' only be a single file
 #' @param collapse.limit integer; number of observations of a
 #' category level above which the category is allowed to be a
 #' distinct binary predictor in binarized categorical covariates.
@@ -85,12 +105,20 @@
 #' allow compatibility with downstream tools that object
 #' to duplicate IDs' presence. note that this argument
 #' is optional, and NA here will be handled correctly
+#' @param suppress.merge.batch logical; whether to prevent
+#' batch variable injection when combining multiple datasets.
+#' note that when this function is called on a single dataset only,
+#' this merge batch variable is unconditionally suppressed
 #' @return data frame; formatted output corresponding to
 #' the specified run parameters. exact format depends on the
 #' specified format flags. with initial configuration, this
 #' will be plink format with headers. output can be emitted
-#' to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\t")
-#' @export construct.trait.file
+#' to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\t").
+#' note that this output will potentially contain an additional
+#' set of batch binary variables indicating the source of
+#' the input data for dataset merge, if that batch variable
+#' was enabled and the output requested covariates
+#' @export combine.trait.files
 construct.trait.file <- function(phenotype.file,
                                  phenotype.config,
                                  phenotype.shared.models,
@@ -101,101 +129,54 @@ construct.trait.file <- function(phenotype.file,
                                  analysis.config,
                                  analysis.name,
                                  collapse.limit,
-                                 id.linker) {
-  ## input sanity checks, and load yaml configuration data for shared models, if specified
-  ## this is combined for complexity reasons
-  stopifnot(is.vector(phenotype.file, mode = "character"), length(phenotype.file) == 1)
-  stopifnot(file.exists(phenotype.file))
-  stopifnot(is.vector(phenotype.config, mode = "character"), length(phenotype.config) == 1)
-  stopifnot(file.exists(phenotype.config))
-  if (!isTRUE(is.na(phenotype.shared.models))) {
-    stopifnot(
-      is.vector(phenotype.shared.models, mode = "character"),
-      length(phenotype.shared.models) == 1
-    )
-    stopifnot(file.exists(phenotype.shared.models))
-    ## merge this information into the phenotype data
-    phenotype.config <- process.phenotypes:::load.configuration(
-      phenotype.config,
-      phenotype.shared.models
-    )
-  } else {
-    ## load yaml configuration data for the phenotype data
-    phenotype.config <- yaml::read_yaml(phenotype.config)
-  }
-  stopifnot(is.vector(eigenvectors, mode = "character"), length(eigenvectors) == 1)
-  stopifnot(is.logical(plink.format), length(plink.format) == 1)
-  stopifnot(is.logical(phenotype.output), length(phenotype.output) == 1)
+                                 id.linker,
+                                 suppress.merge.batch) {
+  ## input sanity checks
+  stopifnot(length(phenotype.config) == length(phenotype.file))
+  stopifnot(length(phenotype.config) == length(phenotype.shared.models))
+  stopifnot(length(phenotype.config) == length(id.linker))
   stopifnot(is.logical(covariate.output), length(covariate.output) == 1)
-  stopifnot(is.vector(analysis.config, mode = "character"), length(analysis.config) == 1)
-  stopifnot(file.exists(analysis.config))
-  stopifnot(is.vector(analysis.name, mode = "character"), length(analysis.name) == 1)
-  stopifnot(is.integer(collapse.limit), length(collapse.limit) == 1)
-  if (!isTRUE(is.na(id.linker))) {
-    stopifnot(is.vector(id.linker, mode = "character"), length(id.linker) == 1)
-    stopifnot(file.exists(id.linker))
-  }
-  ## load yaml configuration data for the analysis
-  analysis.config <- yaml::read_yaml(analysis.config)
-  ## confirm that the requested analysis is present in the config
-  stopifnot(analysis.name %in% names(analysis.config$analyses))
-  ## load actual phenotype data
-  phenotype.data <- read.table(phenotype.file,
-    header = TRUE,
-    stringsAsFactors = FALSE, sep = "\t",
-    quote = "\"", comment.char = ""
-  )
-  ## read in eigenvectors and apply simple transformations
-  ## to prevent plink from complaining about distributions and variance
-  eigenvectors <- gap.construct.trait.file::load.and.process.eigenvectors(eigenvectors)
-
-  ## locate and add the subject ID column
-  subject.id.index <- unlist(sapply(seq_len(length(phenotype.config$variables)), function(i) {
-    if (!is.null(phenotype.config$variables[[i]]$subject_id)) {
-      i
-    }
-  }))
-  stopifnot(length(subject.id.index) == 1, phenotype.config$variables[[subject.id.index]]$subject_id)
-
-  ## if id.linker is NA, this will just return the original ID list unchanged
-  phenotype.data[, subject.id.varname] <- gap.construct.trait.file::remap.ids(
-    phenotype.data[, subject.id.varname],
-    id.linker
-  )
-  ## remove instances where IDs fail to link
-  print(phenotype.data)
-  phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.index]), ]
-  print(phenotype.data)
-
-  output.df <- data.frame(IID = phenotype.data[, subject.id.index], stringsAsFactors = FALSE)
-
-  if (phenotype.output) {
-    output.df <- gap.construct.trait.file::construct.phenotype.output(
-      output.df,
-      phenotype.data,
-      phenotype.config,
-      analysis.config,
-      analysis.name
-    )
-  }
-
-  if (covariate.output) {
-    output.df <- gap.construct.trait.file::construct.covariate.output(
-      output.df,
-      phenotype.data,
-      phenotype.config,
+  stopifnot(is.logical(suppress.merge.batch), length(suppress.merge.batch) == 1)
+  ## if the output style is covariates,
+  ## and the user hasn't suppressed this behavior,
+  ## and there are at least two datasets being combined
+  add.batch <- covariate.output & !suppress.merge.batch & length(phenotype.config) > 1
+  ## iterate across all possible provided files
+  res <- data.frame()
+  for (i in seq_len(length(phenotype.config))) {
+    res.partial <- gap.construct.trait.file::construct.trait.file(
+      phenotype.file[i],
+      phenotype.config[i],
+      phenotype.shared.models[i],
       eigenvectors,
+      plink.format,
+      phenotype.output,
+      covariate.output,
       analysis.config,
       analysis.name,
-      collapse.limit
+      collapse.limit,
+      id.linker[i]
     )
+    if (add.batch) {
+      res.partial[, ncol(res.partial) + 1] <- i
+    }
+    ## combine this information back into the aggregated dataset
+    if (i == 1) {
+      res <- res.partial
+    } else {
+      res <- rbind(res, res.partial)
+    }
   }
-
-  ## report this information to file
-  if (plink.format) {
-    output.df <- gap.construct.trait.file::format.for.plink(output.df)
-  } else {
-    stop("only plink output format is currently supported, and it wasn't requested :(")
+  ## convert the batch variable into binary dummies for association tools.
+  ## note that this doesn't do level collapsing like the primary package does.
+  ## this may need to be patched someday.
+  if (add.batch) {
+    batch.var <- res[, ncol(res)]
+    res[, ncol(res)] <- NULL
+    for (i in seq(2, length(phenotype.config))) {
+      res[, ncol(res) + 1] <- gap.construct.trait.file::make.binary.dummy(batch.var, i)
+    }
   }
-  output.df
+  ## return the combined data
+  res
 }
