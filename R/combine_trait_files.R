@@ -135,6 +135,7 @@ construct.trait.file <- function(phenotype.file,
   stopifnot(length(phenotype.config) == length(phenotype.file))
   stopifnot(length(phenotype.config) == length(phenotype.shared.models))
   stopifnot(length(phenotype.config) == length(id.linker))
+  stopifnot(is.logical(plink.output), length(plink.output) == 1)
   stopifnot(is.logical(covariate.output), length(covariate.output) == 1)
   stopifnot(is.logical(suppress.merge.batch), length(suppress.merge.batch) == 1)
   ## if the output style is covariates,
@@ -176,6 +177,10 @@ construct.trait.file <- function(phenotype.file,
     for (i in seq(2, length(phenotype.config))) {
       res[, ncol(res) + 1] <- gap.construct.trait.file::make.binary.dummy(batch.var, i)
     }
+  }
+  ## deal with the possibility that duplicates have been introduced by merging
+  if (plink.output) {
+    res <- res[!duplicated(res[, 2]) & !duplicated(res[, 2], fromLast = TRUE), ]
   }
   ## return the combined data
   res
