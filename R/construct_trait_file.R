@@ -158,14 +158,12 @@ construct.trait.file <- function(phenotype.file,
   stopifnot(length(subject.id.index) == 1, phenotype.config$variables[[subject.id.index]]$subject_id)
 
   ## if id.linker is NA, this will just return the original ID list unchanged
-  phenotype.data[, subject.id.varname] <- gap.construct.trait.file::remap.ids(
-    phenotype.data[, subject.id.varname],
+  phenotype.data[, subject.id.index] <- gap.construct.trait.file::remap.ids(
+    phenotype.data[, subject.id.index],
     id.linker
   )
   ## remove instances where IDs fail to link
-  print(phenotype.data)
   phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.index]), ]
-  print(phenotype.data)
 
   output.df <- data.frame(IID = phenotype.data[, subject.id.index], stringsAsFactors = FALSE)
 
