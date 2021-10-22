@@ -4,6 +4,7 @@ globals:
 variables:
   ID:
     type: string
+    subject_id: true
   V1:
     type: numeric
   V2:

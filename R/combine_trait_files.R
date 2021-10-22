@@ -119,23 +119,23 @@
 #' the input data for dataset merge, if that batch variable
 #' was enabled and the output requested covariates
 #' @export combine.trait.files
-construct.trait.file <- function(phenotype.file,
-                                 phenotype.config,
-                                 phenotype.shared.models,
-                                 eigenvectors,
-                                 plink.format,
-                                 phenotype.output,
-                                 covariate.output,
-                                 analysis.config,
-                                 analysis.name,
-                                 collapse.limit,
-                                 id.linker,
-                                 suppress.merge.batch) {
+combine.trait.files <- function(phenotype.file,
+                                phenotype.config,
+                                phenotype.shared.models,
+                                eigenvectors,
+                                plink.format,
+                                phenotype.output,
+                                covariate.output,
+                                analysis.config,
+                                analysis.name,
+                                collapse.limit,
+                                id.linker,
+                                suppress.merge.batch) {
   ## input sanity checks
   stopifnot(length(phenotype.config) == length(phenotype.file))
   stopifnot(length(phenotype.config) == length(phenotype.shared.models))
   stopifnot(length(phenotype.config) == length(id.linker))
-  stopifnot(is.logical(plink.output), length(plink.output) == 1)
+  stopifnot(is.logical(plink.format), length(plink.format) == 1)
   stopifnot(is.logical(covariate.output), length(covariate.output) == 1)
   stopifnot(is.logical(suppress.merge.batch), length(suppress.merge.batch) == 1)
   ## if the output style is covariates,
@@ -189,7 +189,7 @@ construct.trait.file <- function(phenotype.file,
     }
   }
   ## deal with the possibility that duplicates have been introduced by merging
-  if (plink.output) {
+  if (plink.format) {
     res <- res[!duplicated(res[, 2]) & !duplicated(res[, 2], fromLast = TRUE), ]
   }
   ## return the combined data
