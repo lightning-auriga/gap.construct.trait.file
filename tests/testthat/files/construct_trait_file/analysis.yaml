@@ -5,3 +5,7 @@ analyses:
       - "phenotype2"
       - "phenotype3"
     pcs: 2
+  testshared:
+    phenotype: "phenotype3"
+    covariates:
+      - "phenotype1"
