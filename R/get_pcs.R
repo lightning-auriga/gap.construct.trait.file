@@ -21,8 +21,10 @@ get.pcs <- function(df, n.pcs, ids) {
   stopifnot(is.data.frame(df))
   stopifnot(is.vector(ids, mode = "character"))
   stopifnot(is.integer(n.pcs), length(n.pcs) == 1)
+  stopifnot(n.pcs > 0)
   stopifnot(n.pcs <= ncol(df) - 2)
-  res <- df[ids, seq(2, n.pcs + 1)]
-  rownames(res) <- ids
+  res <- data.frame(df[ids, seq(2, n.pcs + 1)])
+  colnames(res) <- colnames(df)[seq(2, n.pcs + 1)]
+  rownames(res) <- NULL
   res
 }

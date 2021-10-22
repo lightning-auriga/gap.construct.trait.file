@@ -22,7 +22,6 @@ test_that("get.pcs selects the correct columns in the correct order", {
     PC1 = as.numeric(3:4),
     PC2 = as.numeric(8:9)
   )
-  rownames(expected.df) <- c("C", "D")
   expect_identical(
     get.pcs(eig.data, as.integer(2), c("C", "D")),
     expected.df
@@ -34,9 +33,16 @@ test_that("get.pcs sets subjects absent from eigenvector data to NA", {
     PC1 = c(3, NA, 4),
     PC2 = c(8, NA, 9)
   )
-  rownames(expected.df) <- c("C", "X", "D")
   expect_identical(
     get.pcs(eig.data, as.integer(2), c("C", "X", "D")),
+    expected.df
+  )
+})
+
+test_that("get.pcs returns data frame even when single PC is requested", {
+  expected.df <- data.frame(PC1 = c(3, NA, 4))
+  expect_identical(
+    get.pcs(eig.data, as.integer(1), c("C", "X", "D")),
     expected.df
   )
 })
