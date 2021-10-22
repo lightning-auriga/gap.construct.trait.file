@@ -166,7 +166,7 @@ combine.trait.files <- function(phenotype.file,
       res <- res.partial
     } else {
       ## detect merge problems
-      if (!identical(colnames(res))) {
+      if (!identical(colnames(res), colnames(res.partial))) {
         stop(paste("merging of multiple datasets failed. this is most likely due",
           " to different patterns of categorical level merging in smaller ",
           "and bigger datasets. please consider changing the value of ",
