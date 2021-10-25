@@ -1,0 +1,8 @@
+models:
+  shared_test:
+    type: "categorical"
+    levels:
+      "0":
+        name: "something"
+      "1":
+        name: "something else"

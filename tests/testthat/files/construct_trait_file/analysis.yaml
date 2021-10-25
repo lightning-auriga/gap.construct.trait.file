@@ -1,0 +1,16 @@
+analyses:
+  testcv:
+    phenotype: "phenotype1"
+    covariates:
+      - "phenotype2"
+      - "phenotype3"
+    pcs: 2
+  testshared:
+    phenotype: "phenotype3"
+    covariates:
+      - "phenotype1"
+  testfactor:
+    phenotype: "phenotype1"
+    covariates:
+      - "phenotype4"
+    pcs: 0

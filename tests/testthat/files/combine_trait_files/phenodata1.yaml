@@ -1,0 +1,25 @@
+tag: TMP
+globals:
+  thing: other
+variables:
+  ID:
+    type: string
+    subject_id: true
+  V1:
+    type: numeric
+  V2:
+    type: categorical
+    levels:
+      "0":
+        name: "female"
+      "1":
+        name: "male"
+  V3:
+    type: categorical
+    levels:
+      "0":
+        name: "square"
+      "1":
+        name: "circle"
+      "2":
+        name: "triangle"

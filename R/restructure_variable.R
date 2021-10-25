@@ -45,6 +45,12 @@
 #' when the variable is a phenotype and FALSE when the variable
 #' is a covariate, as the binarization hack only works directly
 #' for covariate data
+#' @param disable.binarization logical; whether to return
+#' N level categorical and ordinal variables split into N-1
+#' binary variables. defaults to FALSE. this should only be
+#' set to TRUE if the downstream application has some method
+#' for dealing with categorical data that doesn't involve
+#' treating them as continuous values
 #' @return data frame; formatted variable(s) corresponding
 #' to requested variable from input phenotype data, in same
 #' order as input phenotype data
@@ -52,7 +58,8 @@ restructure.variable <- function(phenotype.data,
                                  config,
                                  variable.name,
                                  collapse.limit,
-                                 error.on.unsupported.models) {
+                                 error.on.unsupported.models,
+                                 disable.binarization = FALSE) {
   stopifnot(is.data.frame(phenotype.data))
   stopifnot(is.list(config))
   stopifnot(
@@ -60,6 +67,7 @@ restructure.variable <- function(phenotype.data,
     length(variable.name) == 1
   )
   stopifnot(is.logical(error.on.unsupported.models), length(error.on.unsupported.models) == 1)
+  stopifnot(is.logical(disable.binarization), length(disable.binarization) == 1)
   stopifnot(length(which(colnames(phenotype.data) == variable.name)) == 1)
   res <- phenotype.data[, variable.name]
   res.orig <- res
@@ -80,41 +88,17 @@ restructure.variable <- function(phenotype.data,
     stop("factor-type variables with more than two levels are not supported")
   }
   out.df <- data.frame()
-  if (factor.type) {
+  if (factor.type & !disable.binarization) {
     ## construct binary output data
-    collapsed.levels <- c()
-    for (i in 2:length(factor.levels)) {
-      if (length(which(res == names(factor.levels)[i])) <= collapse.limit) {
-        collapsed.levels <- c(collapsed.levels, names(factor.levels)[i])
-        next
-      }
-      new.var <- make.binary.dummy(
-        res,
-        names(factor.levels)[i]
-      )
-      new.var.name <- paste(variable.name,
-        ".ref", names(factor.levels)[1],
-        ".cmp", names(factor.levels)[i],
-        sep = ""
-      )
-      if (i == 2) {
-        out.df <- data.frame(new.var)
-        colnames(out.df) <- new.var.name
-      } else {
-        out.df[, new.var.name] <- new.var
-      }
-    }
-    if (length(collapsed.levels) > 0) {
-      out.df[, paste(variable.name,
-        ".ref", names(factor.levels)[1],
-        ".cmpOTHER",
-        sep = ""
-      )] <- make.binary.dummy(res, collapsed.levels)
-    }
-    ## override naming scheme if there were only two levels
-    if (length(factor.levels) == 2) {
-      colnames(out.df) <- variable.name
-    }
+    out.df <- gap.construct.trait.file::construct.binary.dummies(
+      res,
+      variable.name,
+      factor.levels,
+      collapse.limit
+    )
+  } else if (factor.type) {
+    out.df <- data.frame(factor(res, levels = names(factor.levels)))
+    colnames(out.df) <- variable.name
   } else {
     out.df <- data.frame(res)
     colnames(out.df) <- variable.name

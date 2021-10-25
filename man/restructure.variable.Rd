@@ -9,7 +9,8 @@ restructure.variable(
   config,
   variable.name,
   collapse.limit,
-  error.on.unsupported.models
+  error.on.unsupported.models,
+  disable.binarization = FALSE
 )
 }
 \arguments{
@@ -43,6 +44,13 @@ variable is categorical. this is designed to be set TRUE
 when the variable is a phenotype and FALSE when the variable
 is a covariate, as the binarization hack only works directly
 for covariate data}
+
+\item{disable.binarization}{logical; whether to return
+N level categorical and ordinal variables split into N-1
+binary variables. defaults to FALSE. this should only be
+set to TRUE if the downstream application has some method
+for dealing with categorical data that doesn't involve
+treating them as continuous values}
 }
 \value{
 data frame; formatted variable(s) corresponding

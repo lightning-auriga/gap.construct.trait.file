@@ -17,7 +17,7 @@
 #'
 #' @param phenotype.file character vector; path to and name of
 #' file containing phenotype information. file should be tab-delimited,
-#' with cells quoted in "..." as needed. this is expected to the be
+#' with cells quoted in "..." as needed. this is expected to be the
 #' processed output of process.phenotypes::create.phenotype.report
 #' @param phenotype.config character vector; path to and name of
 #' file containing phenotype configuration data. file should be
@@ -85,6 +85,12 @@
 #' allow compatibility with downstream tools that object
 #' to duplicate IDs' presence. note that this argument
 #' is optional, and NA here will be handled correctly
+#' @param disable.binarization logical; whether to return
+#' N level categorical and ordinal variables split into N-1
+#' binary variables. defaults to FALSE. this should only be
+#' set to TRUE if the downstream application has some method
+#' for dealing with categorical data that doesn't involve
+#' treating them as continuous values
 #' @return data frame; formatted output corresponding to
 #' the specified run parameters. exact format depends on the
 #' specified format flags. with initial configuration, this
@@ -101,15 +107,15 @@ construct.trait.file <- function(phenotype.file,
                                  analysis.config,
                                  analysis.name,
                                  collapse.limit,
-                                 id.linker) {
+                                 id.linker,
+                                 disable.binarization = FALSE) {
   ## input sanity checks, and load yaml configuration data for shared models, if specified
   ## this is combined for complexity reasons
-  phenotype.config <- NULL
   stopifnot(is.vector(phenotype.file, mode = "character"), length(phenotype.file) == 1)
   stopifnot(file.exists(phenotype.file))
   stopifnot(is.vector(phenotype.config, mode = "character"), length(phenotype.config) == 1)
   stopifnot(file.exists(phenotype.config))
-  if (!is.na(phenotype.shared.models)) {
+  if (!isTRUE(is.na(phenotype.shared.models))) {
     stopifnot(
       is.vector(phenotype.shared.models, mode = "character"),
       length(phenotype.shared.models) == 1
@@ -132,10 +138,11 @@ construct.trait.file <- function(phenotype.file,
   stopifnot(file.exists(analysis.config))
   stopifnot(is.vector(analysis.name, mode = "character"), length(analysis.name) == 1)
   stopifnot(is.integer(collapse.limit), length(collapse.limit) == 1)
-  if (!is.na(id.linker)) {
+  if (!isTRUE(is.na(id.linker))) {
     stopifnot(is.vector(id.linker, mode = "character"), length(id.linker) == 1)
     stopifnot(file.exists(id.linker))
   }
+  stopifnot(is.logical(disable.binarization), length(disable.binarization) == 1)
   ## load yaml configuration data for the analysis
   analysis.config <- yaml::read_yaml(analysis.config)
   ## confirm that the requested analysis is present in the config
@@ -150,24 +157,26 @@ construct.trait.file <- function(phenotype.file,
   ## to prevent plink from complaining about distributions and variance
   eigenvectors <- gap.construct.trait.file::load.and.process.eigenvectors(eigenvectors)
 
-
   ## locate and add the subject ID column
-  subject.id.varname <- process.phenotypes:::find.subject.id.varname(phenotype.config)
+  subject.id.index <- unlist(sapply(seq_len(length(phenotype.config$variables)), function(i) {
+    if (!is.null(phenotype.config$variables[[i]]$subject_id)) {
+      i
+    }
+  }))
+  stopifnot(length(subject.id.index) == 1, phenotype.config$variables[[subject.id.index]]$subject_id)
 
-  if (!is.na(id.linker)) {
-    phenotype.data[, subject.id.varname] <- remap.ids(
-      phenotype.data[, subject.id.varname],
-      id.linker
-    )
-    ## remove instances where IDs fail to link
-    phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.varname]), ]
-  }
+  ## if id.linker is NA, this will just return the original ID list unchanged
+  phenotype.data[, subject.id.index] <- gap.construct.trait.file::remap.ids(
+    phenotype.data[, subject.id.index],
+    id.linker
+  )
+  ## remove instances where IDs fail to link
+  phenotype.data <- phenotype.data[!is.na(phenotype.data[, subject.id.index]), ]
 
-  output.df <- data.frame(IID = phenotype.data[, subject.id.varname])
-  output.df[, 1] <- as.vector(output.df[, 1], mode = "character")
+  output.df <- data.frame(IID = phenotype.data[, subject.id.index], stringsAsFactors = FALSE)
 
   if (phenotype.output) {
-    gap.construct.trait.file::construct.phenotype.output(
+    output.df <- gap.construct.trait.file::construct.phenotype.output(
       output.df,
       phenotype.data,
       phenotype.config,
@@ -177,14 +186,15 @@ construct.trait.file <- function(phenotype.file,
   }
 
   if (covariate.output) {
-    gap.construct.trait.file::construct.covariate.output(
+    output.df <- gap.construct.trait.file::construct.covariate.output(
       output.df,
       phenotype.data,
       phenotype.config,
       eigenvectors,
       analysis.config,
       analysis.name,
-      collapse.limit
+      collapse.limit,
+      disable.binarization
     )
   }
 

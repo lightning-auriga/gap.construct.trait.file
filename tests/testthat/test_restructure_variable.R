@@ -1,6 +1,7 @@
 df <- data.frame(
   TV1 = 1:7,
   TV2 = c("pineapple", "banana", "banana", "pineapple", "apple", "kiwi", NA),
+  TV3 = c("purple", "blue", "purple", "blue", "purple", "blue", "blue"),
   ID = c("A", "B", "C", "D", "E", "F", "G"),
   TV3_derived = c(1.23, 3.45, 5.67, 6.78, 7.89, 8.90, 9.10)
 )
@@ -15,6 +16,13 @@ config <- list(
         "2" = list(name = "mango"),
         "3" = list(name = "apple"),
         "4" = list(name = "kiwi")
+      )
+    ),
+    TV3 = list(
+      type = "categorical",
+      levels = list(
+        "0" = list(name = "purple"),
+        "1" = list(name = "blue")
       )
     ),
     ID = list(
@@ -61,6 +69,34 @@ test_that("restructure.variable understands variables in derived variable config
   expected.df <- data.frame(TV3_derived = df$TV3_derived)
   expect_identical(
     restructure.variable(df, config, "TV3_derived", as.integer(1), FALSE),
+    expected.df
+  )
+})
+
+test_that("restructure.variable handles binary covariates correctly", {
+  # error.on.unsupported.models is false
+  expected.df <- data.frame(TV3 = as.numeric(df$TV3 == "blue"))
+  expect_identical(
+    restructure.variable(df, config, "TV3", as.integer(1), FALSE),
+    expected.df
+  )
+})
+
+test_that("restructure.variable handles binary phenotypes correctly", {
+  # error.on.unsupported.models is true
+  expected.df <- data.frame(TV3 = as.numeric(df$TV3 == "blue"))
+  expect_identical(
+    restructure.variable(df, config, "TV3", as.integer(1), TRUE),
+    expected.df
+  )
+})
+
+test_that("restructure.variable respects disable.binarization flag", {
+  expected.df <- data.frame(
+    TV2 = factor(c("0", "1", "1", "0", "3", "4", NA), levels = as.character(0:4))
+  )
+  expect_identical(
+    restructure.variable(df, config, "TV2", as.integer(1), FALSE, TRUE),
     expected.df
   )
 })
