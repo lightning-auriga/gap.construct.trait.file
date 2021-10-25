@@ -155,4 +155,28 @@ test_that("combine.trait.files finds and removes duplicates introduced by mergin
 })
 
 test_that("combine.trait.files deals with sporadic binarization seamlessly", {
+  expected.df <- data.frame(
+    FID = "0",
+    IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"),
+    V2 = c(0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1),
+    V3.ref0.cmp1 = c(0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0),
+    V3.ref0.cmp2 = c(0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0),
+    gap.merge.batch = c(0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+    stringsAsFactors = FALSE
+  )
+  res <- combine.trait.files(
+    c(phenodata1, phenodata2),
+    c(phenoconfig1, phenoconfig2),
+    c(NA, NA),
+    eigenvectors,
+    TRUE,
+    FALSE,
+    TRUE,
+    analysisconfig,
+    "a2",
+    as.integer(0),
+    c(NA, NA),
+    FALSE
+  )
+  expect_identical(res, expected.df)
 })
