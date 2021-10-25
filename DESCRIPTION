@@ -1,6 +1,6 @@
 Package: gap.construct.trait.file
 Title: Construct Model Matrix Files for gwas-analysis-pipeline
-Version: 0.0.1
+Version: 1.0.0
 Authors@R:
     c(person(given = "Bari",
              family = "Ballew",
