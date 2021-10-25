@@ -290,5 +290,22 @@ test_that("construct.trait.file returns covariate and phenotype data only on req
 })
 
 test_that("construct.trait.file respects disable.binarization flag", {
-
+  expected.df <- data.frame(
+    FID = "0", IID = c("A001", "B001", "C001"),
+    phenotype4 = factor(c("20", "30", "99"), levels = c("20", "30", "99"))
+  )
+  expect_identical(construct.trait.file(
+    phenotype.file,
+    phenotype.config,
+    phenotype.shared.models,
+    eigenvectors,
+    plink.format,
+    FALSE,
+    TRUE,
+    analysis.config,
+    "testfactor",
+    collapse.limit,
+    id.linker,
+    TRUE
+  ), expected.df)
 })

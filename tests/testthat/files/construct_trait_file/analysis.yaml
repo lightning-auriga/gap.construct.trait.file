@@ -9,3 +9,8 @@ analyses:
     phenotype: "phenotype3"
     covariates:
       - "phenotype1"
+  testfactor:
+    phenotype: "phenotype1"
+    covariates:
+      - "phenotype4"
+    pcs: 0

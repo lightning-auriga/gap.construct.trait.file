@@ -11,3 +11,12 @@ variables:
     type: "string"
   phenotype3:
     shared_model: "shared_test"
+  phenotype4:
+    type: "ordinal"
+    levels:
+      "20":
+        name: "alpha"
+      "30":
+        name: "beta"
+      "99":
+        name: "gamma"
