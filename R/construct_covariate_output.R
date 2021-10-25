@@ -77,7 +77,7 @@ construct.covariate.output <- function(output.df,
   stopifnot(is.logical(disable.binarization), length(disable.binarization) == 1)
   ## add the covariates to the variable queries
   for (covariate.name in analysis.config$analyses[[analysis.name]]$covariates) {
-    added.df <- gap.construct.trait.file::restructure.variable(
+    added.df <- gap.construct.trait.file:::restructure.variable(
       phenotype.data,
       phenotype.config,
       covariate.name,
@@ -92,7 +92,7 @@ construct.covariate.output <- function(output.df,
     n.pcs <- as.integer(analysis.config$analyses[[analysis.name]]$pcs)
     stopifnot(n.pcs >= 0, n.pcs <= ncol(eigenvectors) - 2)
     if (n.pcs > 0) {
-      added.df <- gap.construct.trait.file::get.pcs(eigenvectors, n.pcs, output.df[, 1])
+      added.df <- gap.construct.trait.file:::get.pcs(eigenvectors, n.pcs, output.df[, 1])
       output.df <- cbind(output.df, added.df)
       colnames(output.df)[seq(ncol(output.df) - ncol(added.df) + 1, ncol(output.df))] <- paste("PC", 1:n.pcs, sep = "")
     }

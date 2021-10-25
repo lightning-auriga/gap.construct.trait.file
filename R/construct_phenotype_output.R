@@ -48,7 +48,7 @@ construct.phenotype.output <- function(output.df,
   stopifnot(nrow(output.df) == nrow(phenotype.data))
   phenotype.name <- analysis.config$analyses[[analysis.name]]$phenotype
   ## add the phenotype to the variable queries
-  added.df <- gap.construct.trait.file::restructure.variable(
+  added.df <- gap.construct.trait.file:::restructure.variable(
     phenotype.data,
     phenotype.config,
     phenotype.name,
