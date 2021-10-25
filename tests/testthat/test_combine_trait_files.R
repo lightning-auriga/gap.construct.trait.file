@@ -73,7 +73,6 @@ test_that("combine.trait.files conducts a simple merge of phenotypes", {
     c(NA, NA),
     TRUE
   )
-  print(res)
   expect_identical(res, expected.df)
 })
 
@@ -156,5 +155,4 @@ test_that("combine.trait.files finds and removes duplicates introduced by mergin
 })
 
 test_that("combine.trait.files deals with sporadic binarization seamlessly", {
-
 })

@@ -214,5 +214,19 @@ test_that("construct.covariate.output adds covariates and PCs", {
 })
 
 test_that("construct.covariate.output respects disable.binarization flag", {
-
+  expected.df <- output.df
+  expected.df <- cbind(
+    expected.df,
+    pheno.df[, "TV1"],
+    factor(c("0", "1", "1", "0", "3", "4", NA), levels = as.character(0:4))
+  )
+  colnames(expected.df)[seq(ncol(expected.df) - 1, ncol(expected.df))] <-
+    c("TV1", "TV2")
+  res <- construct.covariate.output(
+    output.df, pheno.df,
+    pheno.config, eigenvectors,
+    analysis.config, "c2", collapse.limit,
+    TRUE
+  )
+  expect_identical(res, expected.df)
 })

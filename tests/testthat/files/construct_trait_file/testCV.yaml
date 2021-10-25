@@ -10,4 +10,4 @@ variables:
   phenotype2:
     type: "string"
   phenotype3:
-    shared_models: "shared_test"
+    shared_model: "shared_test"

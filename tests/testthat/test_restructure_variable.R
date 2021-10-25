@@ -92,5 +92,11 @@ test_that("restructure.variable handles binary phenotypes correctly", {
 })
 
 test_that("restructure.variable respects disable.binarization flag", {
-
+  expected.df <- data.frame(
+    TV2 = factor(c("0", "1", "1", "0", "3", "4", NA), levels = as.character(0:4))
+  )
+  expect_identical(
+    restructure.variable(df, config, "TV2", as.integer(1), FALSE, TRUE),
+    expected.df
+  )
 })

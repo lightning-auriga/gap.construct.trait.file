@@ -134,7 +134,7 @@ test_that("construct.trait.file checks input types", {
 test_that("construct.trait.file applies shared models to phenotype config", {
   expected.df <- data.frame(
     FID = "0", IID = c("A001", "B001", "C001"),
-    phenotype3 = c("something", "something else", "something")
+    phenotype3 = c(0, 1, 0)
   )
   expect_identical(construct.trait.file(
     phenotype.file,
@@ -229,7 +229,7 @@ test_that("construct.trait.file returns covariate data only on request", {
   expected.df <- data.frame(
     FID = "0", IID = c("A001", "B001", "C001"),
     phenotype2 = c(NA, "crocodile", "llama"),
-    phenotype3 = c("something", "something else", "something"),
+    phenotype3 = c(0, 1, 0),
     PC1 = c(-0.0006505122, -0.7071067812, 0.7071067812),
     PC2 = c(-3.3568964, 0.7071067812, -0.70710678123)
   )
@@ -270,7 +270,7 @@ test_that("construct.trait.file returns covariate and phenotype data only on req
     FID = "0", IID = c("A001", "B001", "C001"),
     phenotype1 = c(0, 1, 1.6),
     phenotype2 = c(NA, "crocodile", "llama"),
-    phenotype3 = c("something", "something else", "something"),
+    phenotype3 = c(0, 1, 0),
     PC1 = c(-0.0006505122, -0.7071067812, 0.7071067812),
     PC2 = c(-3.3568964, 0.7071067812, -0.70710678123)
   )
