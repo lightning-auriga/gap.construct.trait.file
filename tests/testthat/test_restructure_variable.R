@@ -90,3 +90,7 @@ test_that("restructure.variable handles binary phenotypes correctly", {
     expected.df
   )
 })
+
+test_that("restructure.variable respects disable.binarization flag", {
+
+})

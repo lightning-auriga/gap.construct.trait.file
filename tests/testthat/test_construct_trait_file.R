@@ -288,3 +288,7 @@ test_that("construct.trait.file returns covariate and phenotype data only on req
     id.linker
   ), expected.df, tolerance = 1e-5)
 })
+
+test_that("construct.trait.file respects disable.binarization flag", {
+
+})

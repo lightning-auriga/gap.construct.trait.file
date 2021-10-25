@@ -212,3 +212,7 @@ test_that("construct.covariate.output adds covariates and PCs", {
   )
   expect_identical(res, expected.df)
 })
+
+test_that("construct.covariate.output respects disable.binarization flag", {
+
+})
