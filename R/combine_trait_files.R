@@ -156,10 +156,12 @@ combine.trait.files <- function(phenotype.file,
       analysis.config,
       analysis.name,
       collapse.limit,
-      id.linker[i]
+      id.linker[i],
+      TRUE
     )
     if (add.batch) {
-      res.partial[, ncol(res.partial) + 1] <- i
+      res.partial[, ncol(res.partial) + 1] <- factor(i, levels = seq_len(length(phenotype.config)))
+      colnames(res.partial)[ncol(res.partial)] <- "gap.merge.batch"
     }
     ## combine this information back into the aggregated dataset
     if (i == 1) {
@@ -178,17 +180,31 @@ combine.trait.files <- function(phenotype.file,
       res <- rbind(res, res.partial)
     }
   }
-  ## convert the batch variable into binary dummies for association tools.
-  ## note that this doesn't do level collapsing like the primary package does.
-  ## this may need to be patched someday.
-  if (add.batch) {
-    batch.var <- res[, ncol(res)]
-    res[, ncol(res)] <- NULL
-    for (i in seq(2, length(phenotype.config))) {
-      res[, ncol(res) + 1] <- gap.construct.trait.file::make.binary.dummy(batch.var, i)
-      colnames(res)[ncol(res)] <- paste("gap.merge.batch", i, sep = "")
+  ## deal with factor variable expansion now that the merge is complete
+  expanded.factors <- data.frame(res[, 1])
+  colnames(expanded.factors) <- colnames(res)[1]
+  for (i in seq(2, ncol(res))) {
+    if (is.factor(res[, i])) {
+      ## create a placeholder factor level mapping
+      factor.levels <- list()
+      for (lvl in levels(res[, i])) {
+        factor.levels[[lvl]] <- list("name" = lvl)
+      }
+      expanded.factors <- cbind(
+        expanded.factors,
+        gap.construct.trait.file::construct.binary.dummies(
+          res[, i],
+          colnames(res)[i],
+          factor.levels,
+          collapse.limit
+        )
+      )
+    } else {
+      expanded.factors <- cbind(expanded.factors, res[, i])
+      colnames(expanded.factors)[i] <- colnames(res)[i]
     }
   }
+  res <- expanded.factors
   ## deal with the possibility that duplicates have been introduced by merging
   if (plink.format) {
     res <- res[!duplicated(res[, 2]) & !duplicated(res[, 2], fromLast = TRUE), ]

@@ -85,6 +85,12 @@
 #' allow compatibility with downstream tools that object
 #' to duplicate IDs' presence. note that this argument
 #' is optional, and NA here will be handled correctly
+#' @param disable.binarization logical; whether to return
+#' N level categorical and ordinal variables split into N-1
+#' binary variables. defaults to FALSE. this should only be
+#' set to TRUE if the downstream application has some method
+#' for dealing with categorical data that doesn't involve
+#' treating them as continuous values
 #' @return data frame; formatted output corresponding to
 #' the specified run parameters. exact format depends on the
 #' specified format flags. with initial configuration, this
@@ -101,7 +107,8 @@ construct.trait.file <- function(phenotype.file,
                                  analysis.config,
                                  analysis.name,
                                  collapse.limit,
-                                 id.linker) {
+                                 id.linker,
+                                 disable.binarization = FALSE) {
   ## input sanity checks, and load yaml configuration data for shared models, if specified
   ## this is combined for complexity reasons
   stopifnot(is.vector(phenotype.file, mode = "character"), length(phenotype.file) == 1)
@@ -135,6 +142,7 @@ construct.trait.file <- function(phenotype.file,
     stopifnot(is.vector(id.linker, mode = "character"), length(id.linker) == 1)
     stopifnot(file.exists(id.linker))
   }
+  stopifnot(is.logical(disable.binarization), length(disable.binarization) == 1)
   ## load yaml configuration data for the analysis
   analysis.config <- yaml::read_yaml(analysis.config)
   ## confirm that the requested analysis is present in the config
@@ -185,7 +193,8 @@ construct.trait.file <- function(phenotype.file,
       eigenvectors,
       analysis.config,
       analysis.name,
-      collapse.limit
+      collapse.limit,
+      disable.binarization
     )
   }
 

@@ -51,6 +51,12 @@
 #' more observations than this limit, so it still may not converge.
 #' in a future patch, this behavior may be modified to set subjects
 #' falling into this catchall to NA
+#' @param disable.binarization logical; whether to return
+#' N level categorical and ordinal variables split into N-1
+#' binary variables. defaults to FALSE. this should only be
+#' set to TRUE if the downstream application has some method
+#' for dealing with categorical data that doesn't involve
+#' treating them as continuous values
 #' @return input data frame with requested covariate columns appended
 construct.covariate.output <- function(output.df,
                                        phenotype.data,
@@ -58,7 +64,8 @@ construct.covariate.output <- function(output.df,
                                        eigenvectors,
                                        analysis.config,
                                        analysis.name,
-                                       collapse.limit) {
+                                       collapse.limit,
+                                       disable.binarization = FALSE) {
   ## input sanity checking
   stopifnot(is.data.frame(output.df))
   stopifnot(is.data.frame(phenotype.data))
@@ -66,7 +73,8 @@ construct.covariate.output <- function(output.df,
   stopifnot(is.data.frame(eigenvectors))
   stopifnot(is.list(analysis.config))
   stopifnot(is.vector(analysis.name, mode = "character"), length(analysis.name) == 1)
-  stopifnot(is.integer(collapse.limit))
+  stopifnot(is.integer(collapse.limit), length(collapse.limit) == 1)
+  stopifnot(is.logical(disable.binarization), length(disable.binarization) == 1)
   ## add the covariates to the variable queries
   for (covariate.name in analysis.config$analyses[[analysis.name]]$covariates) {
     added.df <- gap.construct.trait.file::restructure.variable(
@@ -74,7 +82,8 @@ construct.covariate.output <- function(output.df,
       phenotype.config,
       covariate.name,
       collapse.limit,
-      FALSE
+      FALSE,
+      disable.binarization
     )
     output.df <- cbind(output.df, added.df)
     colnames(output.df)[seq(ncol(output.df) - ncol(added.df) + 1, ncol(output.df))] <- colnames(added.df)

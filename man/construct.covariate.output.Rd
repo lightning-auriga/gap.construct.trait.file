@@ -12,7 +12,8 @@ construct.covariate.output(
   eigenvectors,
   analysis.config,
   analysis.name,
-  collapse.limit
+  collapse.limit,
+  disable.binarization = FALSE
 )
 }
 \arguments{
@@ -58,6 +59,13 @@ there is no guarantee that the combined variable will have
 more observations than this limit, so it still may not converge.
 in a future patch, this behavior may be modified to set subjects
 falling into this catchall to NA}
+
+\item{disable.binarization}{logical; whether to return
+N level categorical and ordinal variables split into N-1
+binary variables. defaults to FALSE. this should only be
+set to TRUE if the downstream application has some method
+for dealing with categorical data that doesn't involve
+treating them as continuous values}
 }
 \value{
 input data frame with requested covariate columns appended

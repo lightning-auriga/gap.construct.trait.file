@@ -73,6 +73,7 @@ test_that("combine.trait.files conducts a simple merge of phenotypes", {
     c(NA, NA),
     TRUE
   )
+  print(res)
   expect_identical(res, expected.df)
 })
 
@@ -81,7 +82,7 @@ test_that("combine.trait.files conducts a simple merge of covariates", {
     FID = "0",
     IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"),
     V2 = c(0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1),
-    gap.merge.batch2 = c(0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+    gap.merge.batch = c(0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
     stringsAsFactors = FALSE
   )
   res <- combine.trait.files(
