@@ -155,7 +155,7 @@ construct.trait.file <- function(phenotype.file,
   )
   ## read in eigenvectors and apply simple transformations
   ## to prevent plink from complaining about distributions and variance
-  eigenvectors <- gap.construct.trait.file::load.and.process.eigenvectors(eigenvectors)
+  eigenvectors <- gap.construct.trait.file:::load.and.process.eigenvectors(eigenvectors)
 
   ## locate and add the subject ID column
   subject.id.index <- unlist(sapply(seq_len(length(phenotype.config$variables)), function(i) {
@@ -166,7 +166,7 @@ construct.trait.file <- function(phenotype.file,
   stopifnot(length(subject.id.index) == 1, phenotype.config$variables[[subject.id.index]]$subject_id)
 
   ## if id.linker is NA, this will just return the original ID list unchanged
-  phenotype.data[, subject.id.index] <- gap.construct.trait.file::remap.ids(
+  phenotype.data[, subject.id.index] <- gap.construct.trait.file:::remap.ids(
     phenotype.data[, subject.id.index],
     id.linker
   )
@@ -176,7 +176,7 @@ construct.trait.file <- function(phenotype.file,
   output.df <- data.frame(IID = phenotype.data[, subject.id.index], stringsAsFactors = FALSE)
 
   if (phenotype.output) {
-    output.df <- gap.construct.trait.file::construct.phenotype.output(
+    output.df <- gap.construct.trait.file:::construct.phenotype.output(
       output.df,
       phenotype.data,
       phenotype.config,
@@ -186,7 +186,7 @@ construct.trait.file <- function(phenotype.file,
   }
 
   if (covariate.output) {
-    output.df <- gap.construct.trait.file::construct.covariate.output(
+    output.df <- gap.construct.trait.file:::construct.covariate.output(
       output.df,
       phenotype.data,
       phenotype.config,
@@ -200,7 +200,7 @@ construct.trait.file <- function(phenotype.file,
 
   ## report this information to file
   if (plink.format) {
-    output.df <- gap.construct.trait.file::format.for.plink(output.df)
+    output.df <- gap.construct.trait.file:::format.for.plink(output.df)
   } else {
     stop("only plink output format is currently supported, and it wasn't requested :(")
   }

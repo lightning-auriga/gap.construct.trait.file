@@ -145,7 +145,7 @@ combine.trait.files <- function(phenotype.file,
   ## iterate across all possible provided files
   res <- data.frame()
   for (i in seq_len(length(phenotype.config))) {
-    res.partial <- gap.construct.trait.file::construct.trait.file(
+    res.partial <- gap.construct.trait.file:::construct.trait.file(
       phenotype.file[i],
       phenotype.config[i],
       phenotype.shared.models[i],
@@ -192,7 +192,7 @@ combine.trait.files <- function(phenotype.file,
       }
       expanded.factors <- cbind(
         expanded.factors,
-        gap.construct.trait.file::construct.binary.dummies(
+        gap.construct.trait.file:::construct.binary.dummies(
           res[, i],
           colnames(res)[i],
           factor.levels,
