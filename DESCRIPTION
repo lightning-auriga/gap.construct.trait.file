@@ -1,11 +1,15 @@
 Package: gap.construct.trait.file
 Title: Construct Model Matrix Files for gwas-analysis-pipeline
 Version: 0.0.1
-Authors@R: 
-    person(given = "Lightning",
-           family = "Auriga",
-           role = c("aut", "cre"),
-           email = "lightning.auriga@gmail.com")
+Authors@R:
+    c(person(given = "Bari",
+             family = "Ballew",
+             role = "aut",
+             email = "bari.ballew@gmail.com"),
+      person(given = "Lightning",
+             family = "Auriga",
+             role = c("aut", "cre"),
+             email = "lightning.auriga@gmail.com"))
 Description: Read in phenotype text files and configuration yamls. Apply
     configuration information. Using parameter settings, construct output
     files in specified formats for use in downstream GWAS analysis tools.
