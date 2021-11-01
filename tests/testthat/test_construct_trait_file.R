@@ -134,7 +134,7 @@ test_that("construct.trait.file checks input types", {
 test_that("construct.trait.file applies shared models to phenotype config", {
   expected.df <- data.frame(
     FID = "0", IID = c("A001", "B001", "C001"),
-    phenotype3 = c(0, 1, 0)
+    phenotype3 = factor(c("0", "1", "0"), levels = c("0", "1"))
   )
   expect_identical(construct.trait.file(
     phenotype.file,

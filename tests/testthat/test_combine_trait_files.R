@@ -180,3 +180,27 @@ test_that("combine.trait.files deals with sporadic binarization seamlessly", {
   )
   expect_identical(res, expected.df)
 })
+
+test_that("combine.trait.files deals with invariant pre-merge phenotypes seamlessly", {
+  expected.df <- data.frame(
+    FID = "0",
+    IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"),
+    V4 = rep(c(0, 1), each = 6),
+    stringsAsFactors = FALSE
+  )
+  res <- combine.trait.files(
+    c(phenodata1, phenodata2),
+    c(phenoconfig1, phenoconfig2),
+    c(NA, NA),
+    eigenvectors,
+    TRUE,
+    TRUE,
+    FALSE,
+    analysisconfig,
+    "a3",
+    as.integer(0),
+    c(NA, NA),
+    FALSE
+  )
+  expect_identical(res, expected.df)
+})

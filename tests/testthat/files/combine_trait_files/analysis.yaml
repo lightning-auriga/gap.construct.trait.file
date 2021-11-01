@@ -10,3 +10,7 @@ analyses:
       - V2
       - V3
     pcs: 0
+  a3:
+    phenotype: V4
+    pcs: 0
+
