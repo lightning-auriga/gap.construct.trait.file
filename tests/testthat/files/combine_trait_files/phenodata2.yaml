@@ -25,3 +25,10 @@ variables:
         name: "circle"
       "2":
         name: "triangle"
+  V4:
+    type: categorical
+    levels:
+      "0":
+        name: "female"
+      "1":
+        name: "male"

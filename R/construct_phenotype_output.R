@@ -53,6 +53,7 @@ construct.phenotype.output <- function(output.df,
     phenotype.config,
     phenotype.name,
     0,
+    TRUE,
     TRUE
   )
   output.df <- cbind(output.df, added.df)
