@@ -2,3 +2,4 @@
 ^\.lintr$
 
 ^\.pre-commit-config\.yaml$
+^public/.*
