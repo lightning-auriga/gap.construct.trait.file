@@ -1,1 +1,4 @@
 ^LICENSE\.md$
+^\.lintr$
+
+^\.pre-commit-config\.yaml$

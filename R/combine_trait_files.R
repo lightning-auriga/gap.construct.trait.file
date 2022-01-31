@@ -113,7 +113,7 @@
 #' the specified run parameters. exact format depends on the
 #' specified format flags. with initial configuration, this
 #' will be plink format with headers. output can be emitted
-#' to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\t").
+#' to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\\t").
 #' note that this output will potentially contain an additional
 #' set of batch binary variables indicating the source of
 #' the input data for dataset merge, if that batch variable
@@ -145,7 +145,7 @@ combine.trait.files <- function(phenotype.file,
   ## iterate across all possible provided files
   res <- data.frame()
   for (i in seq_len(length(phenotype.config))) {
-    res.partial <- gap.construct.trait.file:::construct.trait.file(
+    res.partial <- construct.trait.file(
       phenotype.file[i],
       phenotype.config[i],
       phenotype.shared.models[i],
@@ -192,7 +192,7 @@ combine.trait.files <- function(phenotype.file,
       }
       expanded.factors <- cbind(
         expanded.factors,
-        gap.construct.trait.file:::construct.binary.dummies(
+        construct.binary.dummies(
           res[, i],
           colnames(res)[i],
           factor.levels,

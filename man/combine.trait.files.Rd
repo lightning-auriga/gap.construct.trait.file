@@ -123,7 +123,7 @@ data frame; formatted output corresponding to
 the specified run parameters. exact format depends on the
 specified format flags. with initial configuration, this
 will be plink format with headers. output can be emitted
-to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\t").
+to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\\t").
 note that this output will potentially contain an additional
 set of batch binary variables indicating the source of
 the input data for dataset merge, if that batch variable

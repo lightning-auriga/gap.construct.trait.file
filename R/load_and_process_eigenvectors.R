@@ -15,6 +15,8 @@
 #' @param eigenvectors character vector; name of input
 #' smartpca eigenvector file
 #' @return loaded and transformed smartpca eigenvector data
+#' @importFrom stats sd
+#' @importFrom utils read.table
 load.and.process.eigenvectors <- function(eigenvectors) {
   ## input sanity checking
   stopifnot(is.vector(eigenvectors, mode = "character"), length(eigenvectors) == 1)

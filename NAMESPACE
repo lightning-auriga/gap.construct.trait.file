@@ -2,3 +2,5 @@
 
 export(combine.trait.files)
 export(construct.trait.file)
+importFrom(stats,sd)
+importFrom(utils,read.table)

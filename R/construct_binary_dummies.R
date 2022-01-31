@@ -21,11 +21,13 @@
 #'
 #' @param vec input categorical data,
 #' in either factor or native format
+#' @param variable.name character vector;
+#' prefix name for all constructed binary dummies
 #' @param factor.levels list; expected to
 #' be configuration data from process.phenotypes.
 #' exact format is: list, where keys are desired
 #' level encodings for the variable, and
-#' factor.levels[[key]]$name is the corresponding
+#' factor.levels\[\[key\]\]$name is the corresponding
 #' value observed in the input data
 #' @param collapse.limit integer; number of observations of a
 #' category level above which the category is allowed to be a
@@ -55,7 +57,7 @@ construct.binary.dummies <- function(vec,
       collapsed.levels <- c(collapsed.levels, names(factor.levels)[i])
       next
     }
-    new.var <- gap.construct.trait.file:::make.binary.dummy(
+    new.var <- make.binary.dummy(
       vec,
       names(factor.levels)[i]
     )
@@ -76,7 +78,7 @@ construct.binary.dummies <- function(vec,
       ".ref", names(factor.levels)[1],
       ".cmpOTHER",
       sep = ""
-    )] <- gap.construct.trait.file:::make.binary.dummy(vec, collapsed.levels)
+    )] <- make.binary.dummy(vec, collapsed.levels)
   }
   ## override naming scheme if there were only two levels
   if (length(factor.levels) == 2) {
