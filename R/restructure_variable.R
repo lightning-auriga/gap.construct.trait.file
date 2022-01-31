@@ -90,7 +90,7 @@ restructure.variable <- function(phenotype.data,
   out.df <- data.frame()
   if (factor.type & !disable.binarization) {
     ## construct binary output data
-    out.df <- gap.construct.trait.file:::construct.binary.dummies(
+    out.df <- construct.binary.dummies(
       res,
       variable.name,
       factor.levels,

@@ -113,7 +113,7 @@ data frame; formatted output corresponding to
 the specified run parameters. exact format depends on the
 specified format flags. with initial configuration, this
 will be plink format with headers. output can be emitted
-to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\t")
+to file with write.table(..., row.names=FALSE, col.names=TRUE, sep="\\t")
 }
 \description{
 Takes in assorted phenotype configuration information

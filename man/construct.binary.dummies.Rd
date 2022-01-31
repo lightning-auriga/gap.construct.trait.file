@@ -11,11 +11,14 @@ construct.binary.dummies(vec, variable.name, factor.levels, collapse.limit)
 \item{vec}{input categorical data,
 in either factor or native format}
 
+\item{variable.name}{character vector;
+prefix name for all constructed binary dummies}
+
 \item{factor.levels}{list; expected to
 be configuration data from process.phenotypes.
 exact format is: list, where keys are desired
 level encodings for the variable, and
-factor.levels[\link{key}]$name is the corresponding
+factor.levels[[key]]$name is the corresponding
 value observed in the input data}
 
 \item{collapse.limit}{integer; number of observations of a
