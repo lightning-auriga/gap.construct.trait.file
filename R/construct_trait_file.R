@@ -153,6 +153,20 @@ construct.trait.file <- function(phenotype.file,
     stringsAsFactors = FALSE, sep = "\t",
     quote = "\"", comment.char = ""
   )
+  sex.specific <- analysis.config$analyses[[analysis.name]][["sex-specific"]]
+  if (!is.null(sex.specific)) {
+    if (sex.specific != "all") {
+      sex.varname <- analysis.config$analyses[[analysis.name]][["sex-varname"]]
+      stopifnot("sex variable name required with sex-specific analysis" = !is.null(sex.varname))
+      stopifnot(
+        "sex variable must be present in phenotype data" =
+          length(which(colnames(phenotype.data) == sex.varname)) == 1
+      )
+      phenotype.data <- phenotype.data[phenotype.data[, sex.varname] == sex.specific &
+        !is.na(phenotype.data[, sex.varname]), ]
+      stopifnot("sex-specific analysis cannot remove all subjects" = nrow(phenotype.data) > 0)
+    }
+  }
   ## read in eigenvectors and apply simple transformations
   ## to prevent plink from complaining about distributions and variance
   eigenvectors <- load.and.process.eigenvectors(eigenvectors)
