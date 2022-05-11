@@ -12,7 +12,6 @@ Description: Read in phenotype text files and configuration yamls. Apply
 License: MIT + file LICENSE
 Imports:
     process.phenotypes,
-    stringr,
     yaml
 Suggests: 
     testthat (>= 3.0.0)
