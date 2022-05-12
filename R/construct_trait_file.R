@@ -162,7 +162,7 @@ construct.trait.file <- function(phenotype.file,
         "sex variable must be present in phenotype data" =
           length(which(colnames(phenotype.data) == sex.varname)) == 1
       )
-      phenotype.data <- phenotype.data[phenotype.data[, sex.varname] == sex.specific &
+      phenotype.data <- phenotype.data[as.character(phenotype.data[, sex.varname]) == as.character(sex.specific) &
         !is.na(phenotype.data[, sex.varname]), ]
       stopifnot("sex-specific analysis cannot remove all subjects" = nrow(phenotype.data) > 0)
     }
