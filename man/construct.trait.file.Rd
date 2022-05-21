@@ -16,7 +16,8 @@ construct.trait.file(
   analysis.name,
   collapse.limit,
   id.linker,
-  disable.binarization = FALSE
+  disable.binarization = FALSE,
+  apply.transformations = TRUE
 )
 }
 \arguments{
@@ -107,6 +108,13 @@ binary variables. defaults to FALSE. this should only be
 set to TRUE if the downstream application has some method
 for dealing with categorical data that doesn't involve
 treating them as continuous values}
+
+\item{apply.transformations}{logical; whether configured
+phenotype transformations should be applied before returning.
+if this function is called directly, transformations are probably
+desired; however, if this is called within the combination function
+that merges datasets, the transformations should likely be done
+on the datasets post-merge}
 }
 \value{
 data frame; formatted output corresponding to

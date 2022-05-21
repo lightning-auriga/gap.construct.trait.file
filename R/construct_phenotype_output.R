@@ -34,17 +34,25 @@
 #' currently being processed. this should correspond to one of
 #' the block names under the "analyses:" tag in the analysis
 #' configuration
+#' @param apply.transformations logical; whether configured
+#' phenotype transformations should be applied before returning.
+#' if this function is called directly, transformations are probably
+#' desired; however, if this is called within the combination function
+#' that merges datasets, the transformations should likely be done
+#' on the datasets post-merge
 #' @return input data frame with requested phenotype column appended
 construct.phenotype.output <- function(output.df,
                                        phenotype.data,
                                        phenotype.config,
                                        analysis.config,
-                                       analysis.name) {
+                                       analysis.name,
+                                       apply.transformations = TRUE) {
   stopifnot(is.data.frame(output.df))
   stopifnot(is.data.frame(phenotype.data))
   stopifnot(is.list(phenotype.config))
   stopifnot(is.list(analysis.config))
   stopifnot(is.vector(analysis.name, mode = "character"), length(analysis.name) == 1)
+  stopifnot(is.logical(apply.transformations), length(apply.transformations) == 1)
   stopifnot(nrow(output.df) == nrow(phenotype.data))
   phenotype.name <- analysis.config$analyses[[analysis.name]]$phenotype
   ## add the phenotype to the variable queries
@@ -56,6 +64,21 @@ construct.phenotype.output <- function(output.df,
     TRUE,
     TRUE
   )
+  if (apply.transformations & !is.null(analysis.config$analyses[[analysis.name]]$transformation)) {
+    strat.vars <- list()
+    if (!is.null(analysis.config$analyses[[analysis.name]]$stratification)) {
+      stopifnot(length(which(analysis.config$analyses[[analysis.name]]$stratification %in% colnames(phenotype.data))) ==
+        length(analysis.config$analyses[[analysis.name]]$stratification))
+      strat.vars <- as.list(phenotype.data[, analysis.config$analyses[[analysis.name]]$stratification])
+    }
+    for (i in seq_len(ncol(added.df))) {
+      added.df[, i] <- transform.variable(
+        added.df[, i],
+        analysis.config$analyses[[analysis.name]]$type,
+        strat.vars
+      )
+    }
+  }
   output.df <- cbind(output.df, added.df)
   colnames(output.df)[-1] <- colnames(added.df)
   output.df

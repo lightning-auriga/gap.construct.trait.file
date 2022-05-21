@@ -91,6 +91,12 @@
 #' set to TRUE if the downstream application has some method
 #' for dealing with categorical data that doesn't involve
 #' treating them as continuous values
+#' @param apply.transformations logical; whether configured
+#' phenotype transformations should be applied before returning.
+#' if this function is called directly, transformations are probably
+#' desired; however, if this is called within the combination function
+#' that merges datasets, the transformations should likely be done
+#' on the datasets post-merge
 #' @return data frame; formatted output corresponding to
 #' the specified run parameters. exact format depends on the
 #' specified format flags. with initial configuration, this
@@ -108,7 +114,8 @@ construct.trait.file <- function(phenotype.file,
                                  analysis.name,
                                  collapse.limit,
                                  id.linker,
-                                 disable.binarization = FALSE) {
+                                 disable.binarization = FALSE,
+                                 apply.transformations = TRUE) {
   ## input sanity checks, and load yaml configuration data for shared models, if specified
   ## this is combined for complexity reasons
   stopifnot(is.vector(phenotype.file, mode = "character"), length(phenotype.file) == 1)
@@ -143,6 +150,7 @@ construct.trait.file <- function(phenotype.file,
     stopifnot(file.exists(id.linker))
   }
   stopifnot(is.logical(disable.binarization), length(disable.binarization) == 1)
+  stopifnot(is.logical(apply.transformations), length(apply.transformations) == 1)
   ## load yaml configuration data for the analysis
   analysis.config <- yaml::read_yaml(analysis.config)
   ## confirm that the requested analysis is present in the config
@@ -195,7 +203,8 @@ construct.trait.file <- function(phenotype.file,
       phenotype.data,
       phenotype.config,
       analysis.config,
-      analysis.name
+      analysis.name,
+      apply.transformations
     )
   }
 

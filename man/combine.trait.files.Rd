@@ -17,7 +17,8 @@ combine.trait.files(
   analysis.name,
   collapse.limit,
   id.linker,
-  suppress.merge.batch
+  suppress.merge.batch,
+  apply.transformations = TRUE
 )
 }
 \arguments{
@@ -117,6 +118,13 @@ is optional, and NA here will be handled correctly}
 batch variable injection when combining multiple datasets.
 note that when this function is called on a single dataset only,
 this merge batch variable is unconditionally suppressed}
+
+\item{apply.transformations}{logical; whether configured
+phenotype transformations should be applied before returning.
+if this function is called directly, transformations are probably
+desired; however, if this is called within the combination function
+that merges datasets, the transformations should likely be done
+on the datasets post-merge}
 }
 \value{
 data frame; formatted output corresponding to
