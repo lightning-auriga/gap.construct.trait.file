@@ -10,7 +10,8 @@ construct.phenotype.output(
   phenotype.data,
   phenotype.config,
   analysis.config,
-  analysis.name
+  analysis.name,
+  apply.transformations = TRUE
 )
 }
 \arguments{
@@ -36,6 +37,13 @@ of gwas-analysis-pipeline for more information}
 currently being processed. this should correspond to one of
 the block names under the "analyses:" tag in the analysis
 configuration}
+
+\item{apply.transformations}{logical; whether configured
+phenotype transformations should be applied before returning.
+if this function is called directly, transformations are probably
+desired; however, if this is called within the combination function
+that merges datasets, the transformations should likely be done
+on the datasets post-merge}
 }
 \value{
 input data frame with requested phenotype column appended
