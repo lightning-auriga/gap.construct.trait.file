@@ -109,6 +109,12 @@
 #' batch variable injection when combining multiple datasets.
 #' note that when this function is called on a single dataset only,
 #' this merge batch variable is unconditionally suppressed
+#' @param apply.transformations logical; whether configured
+#' phenotype transformations should be applied before returning.
+#' if this function is called directly, transformations are probably
+#' desired; however, if this is called within the combination function
+#' that merges datasets, the transformations should likely be done
+#' on the datasets post-merge
 #' @return data frame; formatted output corresponding to
 #' the specified run parameters. exact format depends on the
 #' specified format flags. with initial configuration, this
@@ -130,7 +136,8 @@ combine.trait.files <- function(phenotype.file,
                                 analysis.name,
                                 collapse.limit,
                                 id.linker,
-                                suppress.merge.batch) {
+                                suppress.merge.batch,
+                                apply.transformations = TRUE) {
   ## input sanity checks
   stopifnot(length(phenotype.config) == length(phenotype.file))
   stopifnot(length(phenotype.config) == length(phenotype.shared.models))
@@ -180,6 +187,41 @@ combine.trait.files <- function(phenotype.file,
       res <- rbind(res, res.partial)
     }
   }
+  ## apply transformations
+  if (apply.transformations & !covariate.output) {
+    ## this is harder here, because we don't necessarily have all the data available
+    analysis.config <- yaml::read_yaml(analysis.config)
+    strat.vars <- list()
+    if (!is.null(analysis.config$analyses[[analysis.name]]$stratification)) {
+      build.df <- NULL
+      for (i in seq_len(length(phenotype.file))) {
+        phenotype.data <- read.table(phenotype.file[i],
+          header = TRUE,
+          stringsAsFactors = FALSE, sep = "\t",
+          quote = "\"", comment.char = ""
+        )
+        varnames <- analysis.config$analyses[[analysis.name]]$stratification
+        stopifnot(length(which(varnames %in% colnames(phenotype.data))) ==
+          length(varnames))
+        phenotype.data <- phenotype.data[, analysis.config$analyses[[analysis.name]]$stratification]
+        if (is.null(build.df)) {
+          build.df <- phenotype.data
+        } else {
+          build.df <- rbind(
+            build.df,
+            phenotype.data
+          )
+        }
+      }
+      strat.vars <- as.list(build.df)
+    }
+    res[, 2] <- transform.variable(
+      res[, 2],
+      analysis.config$analyses[[analysis.name]]$type,
+      strat.vars
+    )
+  }
+
   ## deal with factor variable expansion now that the merge is complete
   expanded.factors <- data.frame(res[, 1])
   colnames(expanded.factors) <- colnames(res)[1]
