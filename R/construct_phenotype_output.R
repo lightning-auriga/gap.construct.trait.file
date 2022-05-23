@@ -66,15 +66,16 @@ construct.phenotype.output <- function(output.df,
   )
   if (apply.transformations & !is.null(analysis.config$analyses[[analysis.name]]$transformation)) {
     strat.vars <- list()
-    if (!is.null(analysis.config$analyses[[analysis.name]]$stratification)) {
-      stopifnot(length(which(analysis.config$analyses[[analysis.name]]$stratification %in% colnames(phenotype.data))) ==
-        length(analysis.config$analyses[[analysis.name]]$stratification))
-      strat.vars <- as.list(phenotype.data[, analysis.config$analyses[[analysis.name]]$stratification])
+    if (!is.null(analysis.config$analyses[[analysis.name]]$transformation$stratification)) {
+      stopifnot(length(which(analysis.config$analyses[[analysis.name]]$transformation$stratification %in%
+        colnames(phenotype.data))) ==
+        length(analysis.config$analyses[[analysis.name]]$transformation$stratification))
+      strat.vars <- as.list(phenotype.data[, analysis.config$analyses[[analysis.name]]$transformation$stratification])
     }
     for (i in seq_len(ncol(added.df))) {
       added.df[, i] <- transform.variable(
         added.df[, i],
-        analysis.config$analyses[[analysis.name]]$type,
+        analysis.config$analyses[[analysis.name]]$transformation$type,
         strat.vars
       )
     }
