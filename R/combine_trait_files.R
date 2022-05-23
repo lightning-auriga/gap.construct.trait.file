@@ -164,7 +164,8 @@ combine.trait.files <- function(phenotype.file,
       analysis.name,
       collapse.limit,
       id.linker[i],
-      TRUE
+      TRUE,
+      FALSE
     )
     if (add.batch) {
       res.partial[, ncol(res.partial) + 1] <- factor(i, levels = seq_len(length(phenotype.config)))
@@ -192,7 +193,7 @@ combine.trait.files <- function(phenotype.file,
     ## this is harder here, because we don't necessarily have all the data available
     analysis.config <- yaml::read_yaml(analysis.config)
     strat.vars <- list()
-    if (!is.null(analysis.config$analyses[[analysis.name]]$stratification)) {
+    if (!is.null(analysis.config$analyses[[analysis.name]]$transformation$stratification)) {
       build.df <- NULL
       for (i in seq_len(length(phenotype.file))) {
         phenotype.data <- read.table(phenotype.file[i],
@@ -200,24 +201,49 @@ combine.trait.files <- function(phenotype.file,
           stringsAsFactors = FALSE, sep = "\t",
           quote = "\"", comment.char = ""
         )
-        varnames <- analysis.config$analyses[[analysis.name]]$stratification
+        current.pheno.config <- yaml::read_yaml(phenotype.config[i])
+        subject.id.varname <- colnames(phenotype.data)[unname(sapply(
+          current.pheno.config$variables,
+          function(i) {
+            ifelse(!is.null(i[["subject_id"]]),
+              i[["subject_id"]],
+              FALSE
+            )
+          }
+        ))]
+        varnames <- c(
+          subject.id.varname,
+          analysis.config$analyses[[analysis.name]]$transformation$stratification
+        )
         stopifnot(length(which(varnames %in% colnames(phenotype.data))) ==
           length(varnames))
-        phenotype.data <- phenotype.data[, analysis.config$analyses[[analysis.name]]$stratification]
+        phenotype.data <- phenotype.data[, varnames]
+        phenotype.data[, 1] <- remap.ids(
+          phenotype.data[, 1],
+          id.linker[i]
+        )
+        ## harmonize column names so rbind won't complain
+        colnames(phenotype.data) <- paste("var", seq_len(ncol(phenotype.data)), sep = "")
         if (is.null(build.df)) {
-          build.df <- phenotype.data
+          build.df <- data.frame(phenotype.data)
         } else {
           build.df <- rbind(
             build.df,
-            phenotype.data
+            data.frame(phenotype.data)
           )
         }
       }
-      strat.vars <- as.list(build.df)
+      my.colnames <- colnames(build.df)
+      build.df <- build.df[!is.na(build.df[, 1]), ]
+      build.df <- build.df[!duplicated(build.df[, 1]), ]
+      rownames(build.df) <- build.df[, 1]
+      build.df <- build.df[res[, ifelse(plink.format, 2, 1)], ]
+      strat.vars <- as.list(data.frame(build.df[, -1]))
+      names(strat.vars) <- my.colnames[-1]
     }
-    res[, 2] <- transform.variable(
-      res[, 2],
-      analysis.config$analyses[[analysis.name]]$type,
+    res[, ifelse(plink.format, 3, 2)] <- transform.variable(
+      res[, ifelse(plink.format, 3, 2)],
+      analysis.config$analyses[[analysis.name]]$transformation$type,
       strat.vars
     )
   }

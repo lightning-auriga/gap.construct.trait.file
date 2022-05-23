@@ -12,6 +12,10 @@ transform.variable <- function(vec,
     ## just echo what was input
     vec
   } else if (transform.type == "inverse_normal_transform") {
+    for (var.index in seq_len(length(transform.strat))) {
+      transform.strat[[var.index]] <- factor(transform.strat[[var.index]])
+    }
+    vec <- as.numeric(vec)
     process.phenotypes::derive.rank.normal.transform(vec,
       stratification.vars = transform.strat
     )
