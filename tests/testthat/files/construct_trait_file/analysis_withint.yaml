@@ -1,0 +1,18 @@
+analyses:
+  a1:
+    phenotype: V1
+    covariates:
+      - V2
+    pcs: 0
+    transformation:
+      type: inverse_normal_transform
+  a2:
+    phenotype: V1
+    covariates:
+      - V2
+      - V3
+    pcs: 0
+  a3:
+    phenotype: V4
+    pcs: 0
+
