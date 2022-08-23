@@ -1,10 +1,14 @@
 phenodata1 <- testthat::test_path("files", "combine_trait_files", "phenodata1.tsv")
+phenodata1.forint <- testthat::test_path("files", "combine_trait_files", "phenodata1_forint.tsv")
 phenoconfig1 <- testthat::test_path("files", "combine_trait_files", "phenodata1.yaml")
 phenodata2 <- testthat::test_path("files", "combine_trait_files", "phenodata2.tsv")
+phenodata2.forint <- testthat::test_path("files", "combine_trait_files", "phenodata2_forint.tsv")
 phenoconfig2 <- testthat::test_path("files", "combine_trait_files", "phenodata2.yaml")
 phenodata3 <- testthat::test_path("files", "combine_trait_files", "phenodata3.tsv")
 phenoconfig3 <- testthat::test_path("files", "combine_trait_files", "phenodata3.yaml")
 analysisconfig <- testthat::test_path("files", "combine_trait_files", "analysis.yaml")
+analysisconfig.withint <- testthat::test_path("files", "combine_trait_files", "analysis_withint.yaml")
+analysisconfig.withint.strat <- testthat::test_path("files", "combine_trait_files", "analysis_withint_strat.yaml")
 eigenvectors <- testthat::test_path("files", "combine_trait_files", "eigenvectors.tsv")
 
 test_that("combine.trait.files checks input types", {
@@ -203,4 +207,76 @@ test_that("combine.trait.files deals with invariant pre-merge phenotypes seamles
     FALSE
   )
   expect_identical(res, expected.df)
+})
+
+test_that("combine.trait.files applies inverse normal transform across files", {
+  expected.df <- data.frame(
+    FID = "0",
+    IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"),
+    V1 = c(
+      -1.6906216,
+      -0.7478586,
+      -0.2298841,
+      0.2298841,
+      0.7478586,
+      1.6906216,
+      -1.0968036,
+      -0.4727891,
+      0.0,
+      0.4727891,
+      1.0968036
+    ),
+    stringsAsFactors = FALSE
+  )
+  res <- combine.trait.files(
+    c(phenodata1.forint, phenodata2.forint),
+    c(phenoconfig1, phenoconfig2),
+    c(NA, NA),
+    eigenvectors,
+    TRUE,
+    TRUE,
+    FALSE,
+    analysisconfig.withint,
+    "a1",
+    as.integer(0),
+    c(NA, NA),
+    TRUE
+  )
+  expect_equal(res, expected.df, tolerance = 1e-6)
+})
+
+test_that("combine.trait.files applies inverse normal transform across files", {
+  expected.df <- data.frame(
+    FID = "0",
+    IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"),
+    V1 = c(
+      -1.6906216,
+      -0.4727891,
+      0.4727891,
+      -0.2298841,
+      0.2298841,
+      1.6906216,
+      -1.0968036,
+      0.0,
+      -0.7478586,
+      1.0968036,
+      0.7478586
+    ),
+    stringsAsFactors = FALSE
+  )
+  res <- combine.trait.files(
+    c(phenodata1.forint, phenodata2.forint),
+    c(phenoconfig1, phenoconfig2),
+    c(NA, NA),
+    eigenvectors,
+    TRUE,
+    TRUE,
+    FALSE,
+    analysisconfig.withint.strat,
+    "a1",
+    as.integer(0),
+    c(NA, NA),
+    TRUE
+  )
+  expect_equal(res, expected.df, tolerance = 1e-6)
 })
