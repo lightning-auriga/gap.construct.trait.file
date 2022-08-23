@@ -1,6 +1,9 @@
 # set default parameters for function construct.trait.file
 phenotype.file <- testthat::test_path("files", "construct_trait_file", "testCV.tsv")
+phenotype.file.forint <- testthat::test_path("files", "construct_trait_file", "data_forint.tsv")
 phenotype.config <- testthat::test_path("files", "construct_trait_file", "testCV.yaml")
+phenotype.config.withint <- testthat::test_path("files", "construct_trait_file", "analysis_withint.yaml")
+phenotype.config.withint.strat <- testthat::test_path("files", "construct_trait_file", "analysis_withint_strat.yaml")
 phenotype.shared.models <- testthat::test_path("files", "construct_trait_file", "shared-models.yaml")
 eigenvectors <- testthat::test_path("files", "construct_trait_file", "transformed_eigenvalues.tsv")
 plink.format <- TRUE

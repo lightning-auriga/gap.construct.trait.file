@@ -202,7 +202,7 @@ combine.trait.files <- function(phenotype.file,
           quote = "\"", comment.char = ""
         )
         current.pheno.config <- yaml::read_yaml(phenotype.config[i])
-        subject.id.varname <- colnames(phenotype.data)[unname(sapply(
+        subject.id.varname <- colnames(phenotype.data)[seq_len(length(current.pheno.config$variables))][unname(sapply(
           current.pheno.config$variables,
           function(i) {
             ifelse(!is.null(i[["subject_id"]]),
