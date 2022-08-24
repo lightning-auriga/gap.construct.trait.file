@@ -32,3 +32,10 @@ variables:
         name: "female"
       "1":
         name: "male"
+  V22:
+    type: categorical
+    levels:
+      "lvl0":
+        name: "female"
+      "lvl1":
+        name: "male"

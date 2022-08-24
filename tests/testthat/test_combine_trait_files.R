@@ -105,6 +105,31 @@ test_that("combine.trait.files conducts a simple merge of covariates", {
   expect_identical(res, expected.df)
 })
 
+test_that("combine.trait.files handles categorical merge when level keys differ", {
+  expected.df <- data.frame(
+    FID = "0",
+    IID = c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"),
+    V22 = c(0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1),
+    gap.merge.batch = c(0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+    stringsAsFactors = FALSE
+  )
+  res <- combine.trait.files(
+    c(phenodata1, phenodata2),
+    c(phenoconfig1, phenoconfig2),
+    c(NA, NA),
+    eigenvectors,
+    TRUE,
+    FALSE,
+    TRUE,
+    analysisconfig,
+    "a5",
+    as.integer(0),
+    c(NA, NA),
+    FALSE
+  )
+  expect_identical(res, expected.df)
+})
+
 test_that("combine.trait.files respects user suppression of batch variable", {
   expected.df <- data.frame(
     FID = "0",

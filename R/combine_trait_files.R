@@ -1,3 +1,110 @@
+#' @title
+#' Get categorical level mapping keys and primary names from configuration data.
+#'
+#' @param phenotype.config Character vector name of phenotype configuration file.
+#' @param phenotype.shared.models Character vector name of shared models configuration file.
+#' @param varname Character vector standardized name of variable of interest.
+#' @return List, first entry "names" the mapping keys from the corresponding "levels" list,
+#' and second entry "labels" the primary alias for each categorical level.
+get.lvl.names.labels <- function(phenotype.config,
+                                 phenotype.shared.models,
+                                 varname) {
+  pheno.config.data <- yaml::read_yaml(phenotype.config)
+  shared.model.data <- list()
+  if (!is.na(phenotype.shared.models)) {
+    shared.model.data <- yaml::read_yaml(phenotype.shared.models)
+  }
+
+  stopifnot(varname %in% names(pheno.config.data$variables))
+
+  if (!is.null(pheno.config.data$variables[[varname]]$shared_model)) {
+    lvl.names <- names(shared.model.data$models[[pheno.config.data$variables[[varname]]$shared_model]]$levels)
+    lvl.labels <- sapply(
+      shared.model.data$models[[pheno.config.data$variables[[varname]]$shared_model]]$levels,
+      function(i) {
+        i$name
+      }
+    )
+  } else {
+    lvl.names <- names(pheno.config.data$variables[[varname]]$levels)
+    lvl.labels <- sapply(
+      pheno.config.data$variables[[varname]]$levels,
+      function(i) {
+        i$name
+      }
+    )
+  }
+  list(
+    names = unname(lvl.names),
+    labels = unname(lvl.labels)
+  )
+}
+
+#' @title
+#' Allow merging of categoricals with identical primary aliases but different
+#' arbitrary mapping keys.
+#'
+#' @param vec Factor of input data that requires mapping.
+#' @param ref.data List of names and labels for reference categorical configuration.
+#' @param alt.data List of names and labels for merging categorical configuration.
+#' @return Factor of input data remapped as needed.
+map.lvl.data <- function(vec,
+                         ref.data,
+                         alt.data) {
+  vec <- as.character(vec)
+  ## for now, enforce that the factor data from the two sources must be directly compatible
+  stopifnot(length(ref.data$names) == length(alt.data$names))
+  stopifnot(identical(sort(ref.data$labels), sort(alt.data$labels)))
+  level.mapping <- ref.data$names[order(ref.data$labels)]
+  names(level.mapping) <- alt.data$names[order(alt.data$labels)]
+  vec <- level.mapping[vec]
+  vec <- factor(vec, levels = ref.data$names)
+  vec
+}
+
+#' @title
+#' Before merging files, resolve level mappings in factor variables to match
+#' the mappings in the original file.
+#'
+#' @param df Data frame of constructed model matrix.
+#' @param phenotype.config Character vector of input phenotype configuration files.
+#' @param phenotype.shared.models Character vector of input shared models configuration files.
+#' @param index Integer or numeric index of currently merging file.
+#' @return Data frame of input data with factor variables remapped as needed.
+map.factor.levels <- function(df,
+                              phenotype.config,
+                              phenotype.shared.models,
+                              index) {
+  if (index > 1) {
+    phenotype.config.ref <- phenotype.config[1]
+    phenotype.shared.models.ref <- phenotype.shared.models[1]
+    phenotype.config.alt <- phenotype.config[index]
+    phenotype.shared.models.alt <- phenotype.shared.models[index]
+    for (i in seq(2, ncol(df))) {
+      if (is.factor(df[, i])) {
+        ref.data <- get.lvl.names.labels(
+          phenotype.config.ref,
+          phenotype.shared.models.ref,
+          colnames(df)[i]
+        )
+        alt.data <- get.lvl.names.labels(
+          phenotype.config.alt,
+          phenotype.shared.models.alt,
+          colnames(df)[i]
+        )
+        df[, i] <- map.lvl.data(
+          df[, i],
+          ref.data,
+          alt.data
+        )
+      }
+    }
+  }
+
+  df
+}
+
+
 #' Build a gwas-ready trait file from phenotype configuration,
 #' potentially combining across multiple datasets
 #'
@@ -166,6 +273,12 @@ combine.trait.files <- function(phenotype.file,
       id.linker[i],
       TRUE,
       FALSE
+    )
+    res.partial <- map.factor.levels(
+      res.partial,
+      phenotype.config,
+      phenotype.shared.models,
+      i
     )
     if (add.batch) {
       res.partial[, ncol(res.partial) + 1] <- factor(i, levels = seq_len(length(phenotype.config)))
