@@ -1,7 +1,7 @@
-ID	V1	V2	V2a	V3	V4
-G	0.1	male	1	square	male
-H	0.2	male	2	circle	male
-I	0.1	female	3	circle	male
-J	-0.01	male	4	triangle	male
-K	-0.05	female	5	triangle	male
-L	0.3	male	6	square	male
+ID	V1	V2	V2a	V3	V4	V22
+G	0.1	male	1	square	male	male
+H	0.2	male	2	circle	male	male
+I	0.1	female	3	circle	male	female
+J	-0.01	male	4	triangle	male	male
+K	-0.05	female	5	triangle	male	female
+L	0.3	male	6	square	male	male

@@ -1,7 +1,7 @@
-ID	V1	V2	V3	V4
-A	0.01	female	square	female
-B	0.02	male	circle	female
-C	0.01	male	circle	female
-D	-0.1	female	square	female
-E	-0.5	female	triangle	female
-F	0.03	female	square	female
+ID	V1	V2	V3	V4	V22
+A	0.01	female	square	female	female
+B	0.02	male	circle	female	male
+C	0.01	male	circle	female	male
+D	-0.1	female	square	female	female
+E	-0.5	female	triangle	female	female
+F	0.03	female	square	female	female

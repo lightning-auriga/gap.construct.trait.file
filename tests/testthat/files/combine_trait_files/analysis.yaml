@@ -13,4 +13,9 @@ analyses:
   a3:
     phenotype: V4
     pcs: 0
+  a5:
+    phenotype: V1
+    covariates:
+      - V22
+    pcs: 0
 
