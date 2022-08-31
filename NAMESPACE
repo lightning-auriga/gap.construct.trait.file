@@ -2,5 +2,6 @@
 
 export(combine.trait.files)
 export(construct.trait.file)
+export(match.controls)
 importFrom(stats,sd)
 importFrom(utils,read.table)

@@ -7,4 +7,8 @@ R native unit testing.
 
 ## Version History
 
+See [the changelog](CHANGELOG.md) for details.
+
+31 August 2022: add changelog
+
 21 October 2021: package initialized
