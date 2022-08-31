@@ -11,6 +11,7 @@ Description: Read in phenotype text files and configuration yamls. Apply
     Test library utilities.
 License: MIT + file LICENSE
 Imports:
+    optmatch,
     process.phenotypes,
     yaml
 Suggests: 
