@@ -55,10 +55,10 @@ match.controls <- function(phenotype.file,
   selected.pcs <- paste("PC", seq_len(n.pcs.match), sep = "")
   stopifnot(length(which(selected.pcs %in% colnames(covariate.data))) == n.pcs.match)
   data <- data.frame(
-    phenotype.file[, 3],
-    covariate.file[, selected.pcs]
+    phenotype.data[, 3],
+    covariate.data[, selected.pcs]
   )
-  rownames(data) <- phenotype.file[, 2]
+  rownames(data) <- phenotype.data[, 2]
   colnames(data) <- c("outcome", selected.pcs)
 
   n.cases <- length(which(!is.na(data[, 1]) & data[, 1] == 1))
@@ -69,7 +69,8 @@ match.controls <- function(phenotype.file,
   matched.on <- optmatch::match_on(form, data = data)
   result <- optmatch::fullmatch(matched.on,
     min.controls = 1,
-    max.controls = effective.max.controls
+    max.controls = effective.max.controls,
+    data = data
   )
   phenotype.data[is.na(result), 3] <- NA
   write.table(phenotype.data, output.file,
