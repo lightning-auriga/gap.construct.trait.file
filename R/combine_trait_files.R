@@ -15,29 +15,38 @@ get.lvl.names.labels <- function(phenotype.config,
     shared.model.data <- yaml::read_yaml(phenotype.shared.models)
   }
 
-  stopifnot(varname %in% names(pheno.config.data$variables))
+  stopifnot(varname %in% names(pheno.config.data$variables) ||
+    varname %in% names(pheno.config.data$derived))
 
-  if (!is.null(pheno.config.data$variables[[varname]]$shared_model)) {
-    lvl.names <- names(shared.model.data$models[[pheno.config.data$variables[[varname]]$shared_model]]$levels)
+  var.target <- NULL
+  if (varname %in% names(pheno.config.data$variables)) {
+    var.target <- pheno.config.data$variables[[varname]]
+  } else {
+    var.target <- pheno.config.data$derived[[varname]]
+  }
+
+  if (!is.null(var.target$shared_model)) {
+    lvl.names <- names(shared.model.data$models[[var.target$shared_model]]$levels)
     lvl.labels <- sapply(
-      shared.model.data$models[[pheno.config.data$variables[[varname]]$shared_model]]$levels,
+      shared.model.data$models[[var.target$shared_model]]$levels,
       function(i) {
         i$name
       }
     )
   } else {
-    lvl.names <- names(pheno.config.data$variables[[varname]]$levels)
+    lvl.names <- names(var.target$levels)
     lvl.labels <- sapply(
-      pheno.config.data$variables[[varname]]$levels,
+      var.target$levels,
       function(i) {
         i$name
       }
     )
   }
-  list(
+  res <- list(
     names = unname(lvl.names),
     labels = unname(lvl.labels)
   )
+  res
 }
 
 #' @title
