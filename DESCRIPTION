@@ -1,6 +1,6 @@
 Package: gap.construct.trait.file
 Title: Construct Model Matrix Files for gwas-analysis-pipeline
-Version: 1.0.5
+Version: 1.0.7
 Authors@R: c(
     person("Bari", "Ballew", , "bari.ballew@gmail.com", role = "aut"),
     person("Lightning", "Auriga", , "lightning.auriga@gmail.com", role = c("aut", "cre"))
