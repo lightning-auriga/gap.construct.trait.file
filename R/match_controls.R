@@ -63,12 +63,13 @@ match.controls <- function(phenotype.file,
 
   n.cases <- length(which(!is.na(data[, 1]) & data[, 1] == 1))
   n.controls <- length(which(!is.na(data[, 1]) & data[, 1] == 0))
-  effective.max.controls <- floor(min(n.controls / n.cases, n.controls.per.case))
+  effective.max.controls <- min(floor(n.controls / n.cases), n.controls.per.case)
+  print(paste("effective max controls: ", effective.max.controls, sep = " "))
   stopifnot(effective.max.controls >= 1)
   form <- as.formula(paste("outcome", paste(selected.pcs, collapse = " + "), sep = " ~ "))
   matched.on <- optmatch::match_on(form, data = data)
   result <- optmatch::fullmatch(matched.on,
-    min.controls = 1,
+    min.controls = effective.max.controls,
     max.controls = effective.max.controls,
     data = data
   )
