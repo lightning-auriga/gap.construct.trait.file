@@ -311,7 +311,7 @@ combine.trait.files <- function(phenotype.file,
     }
   }
   ## apply transformations
-  if (apply.transformations & !covariate.output) {
+  if (apply.transformations && !covariate.output) {
     ## this is harder here, because we don't necessarily have all the data available
     analysis.config <- yaml::read_yaml(analysis.config)
     strat.vars <- list()

@@ -84,11 +84,11 @@ restructure.variable <- function(phenotype.data,
     }
     factor.level.count <- length(factor.levels)
   }
-  if (factor.type & error.on.unsupported.models & factor.level.count > 2) {
+  if (factor.type && error.on.unsupported.models && factor.level.count > 2) {
     stop("factor-type variables with more than two levels are not supported")
   }
   out.df <- data.frame()
-  if (factor.type & !disable.binarization) {
+  if (factor.type && !disable.binarization) {
     ## construct binary output data
     out.df <- construct.binary.dummies(
       res,

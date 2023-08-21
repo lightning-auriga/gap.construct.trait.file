@@ -64,7 +64,7 @@ construct.phenotype.output <- function(output.df,
     TRUE,
     TRUE
   )
-  if (apply.transformations & !is.null(analysis.config$analyses[[analysis.name]]$transformation)) {
+  if (apply.transformations && !is.null(analysis.config$analyses[[analysis.name]]$transformation)) {
     strat.vars <- list()
     if (!is.null(analysis.config$analyses[[analysis.name]]$transformation$stratification)) {
       stopifnot(length(which(analysis.config$analyses[[analysis.name]]$transformation$stratification %in%
